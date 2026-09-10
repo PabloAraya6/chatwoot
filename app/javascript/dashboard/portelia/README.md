@@ -19,7 +19,10 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
   traspaso de la secretaria (`content_attributes.traspaso` de su nota privada). `propiedades/` es
   la pantalla de Propiedades sobre `/mi/api/propiedades` (Button, Input, Select, Dialog, Label,
   CardLayout, Breadcrumb de `components-next`); los enums de la Propiedad viven copiados en
-  `propiedades/propiedad.js` porque el fork no importa del monorepo.
+  `propiedades/propiedad.js` porque el fork no importa del monorepo. `AvisoPush.vue`
+  es el `Banner` de upstream debajo del encabezado de la lista que pide el permiso de push con
+  un gesto y guarda la suscripción; desaparece cuando este browser ya está suscripto o el asesor
+  lo negó. El service worker que muestra el push es `public/sw.js`.
 - `composables/`: `usePorteliaUi` (el flag), `useEntradasAsesor` (la lista de entradas que
   comparten el sidebar y la barra), `useBarraInferior` (cuándo se ve la barra).
 - `bandeja.js`: `pestanasAsesor`, las pestañas Mías y Guardia que `ChatList.vue` usa con el flag.
