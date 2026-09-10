@@ -8,12 +8,14 @@ const props = defineProps({
 
 const { t } = useI18n();
 
-const titulos = {
-  propiedades: t('PORTELIA.SIDEBAR.PROPIEDADES'),
-  agenda: t('PORTELIA.SIDEBAR.AGENDA'),
-  configuracion: t('PORTELIA.SIDEBAR.CONFIGURACION'),
-};
-const titulo = computed(() => titulos[props.pantalla]);
+const titulo = computed(
+  () =>
+    ({
+      propiedades: t('PORTELIA.SIDEBAR.PROPIEDADES'),
+      agenda: t('PORTELIA.SIDEBAR.AGENDA'),
+      configuracion: t('PORTELIA.SIDEBAR.CONFIGURACION'),
+    })[props.pantalla]
+);
 </script>
 
 <template>

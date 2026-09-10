@@ -31,10 +31,10 @@ Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
 ## Prender el flag
 
 ```sh
-bin/portelia-dev exec rails-taller bundle exec rails runner "Account.find(6).enable_features('portelia_ui')"
+bin/portelia-dev exec rails-taller bundle exec rails runner "Account.find(6).enable_features!('portelia_ui')"
 ```
 
-`disable_features` lo apaga. En una instancia real se hace por consola o por Super Admin.
+`disable_features!` lo apaga (sin el `!` no se guarda). En una instancia real se hace por consola o por Super Admin.
 
 ## El taller
 
@@ -61,6 +61,13 @@ aparece al recargar, no en vivo; lo que hace el taller sí es en vivo.
   Mac para el websocket de HMR.
 
 Usuarios del laboratorio: en la memoria del monorepo (`asesor alfredo.bettio@estudio3.demo`).
+
+Trampa: el laboratorio tiene en `InstallationConfig` `DASHBOARD_SCRIPTS` el script de marca del
+stock (`deploy/brand` del monorepo), que reetiqueta el DOM por `MutationObserver` (Bandeja
+pasa a Consultas, aparecen Mías y Guardia). Como la base es compartida, en el taller también
+corre. Para ver el fork pelado se vacía y se restaura desde el taller:
+`InstallationConfig.find_by(name: 'DASHBOARD_SCRIPTS').update!(value: '')` por rails runner
+(guardar el valor antes). Deja de hacer falta cuando la marca pase al fork.
 
 ## Lint y tests
 
