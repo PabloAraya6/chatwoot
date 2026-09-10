@@ -26,21 +26,33 @@ import {
 // de estado, agendar una nueva y editar las franjas. Lee /mi/api; el nombre de la Persona
 // sale del store de contactos de Chatwoot, que ya sabe buscarlo.
 const { t } = useI18n();
+
 const store = useStore();
 
 const DIAS = 7;
+
 const DIA_MS = 86_400_000;
 
 const visitas = ref([]);
+
 const propiedades = ref([]);
+
 const cargando = ref(true);
+
 const ocupadaId = ref('');
+
 const seleccionada = ref(null);
+
 const nuevaVisitaRef = ref(null);
+
 const cancelarRef = ref(null);
+
 const disponibilidadRef = ref(null);
+
 const nuevaReaccionRef = ref(null);
+
 const cierreRef = ref(null);
+
 const nuevaOperacionRef = ref(null);
 
 const nombreDe = contactId =>
@@ -55,15 +67,18 @@ const traerNombres = () => {
 
 const cargar = async () => {
   cargando.value = true;
+
   try {
     const desde = inicioDelDia(hoy());
     const hasta = new Date(desde.getTime() + DIAS * DIA_MS);
+
     const [agenda, lista] = await Promise.all([
       miApi.get(
         `agenda?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`
       ),
       miApi.get('propiedades'),
     ]);
+
     visitas.value = agenda.data;
     propiedades.value = lista.data;
     traerNombres();
@@ -81,7 +96,9 @@ const dias = computed(() =>
     visitas: visitas.value.filter(visita => claveDia(visita.at) === clave),
   }))
 );
+
 const hoyDia = computed(() => dias.value[0]);
+
 const semana = computed(() =>
   dias.value.slice(1).filter(dia => dia.visitas.length > 0)
 );
@@ -94,14 +111,17 @@ const reemplazar = visita => {
 
 const patch = async (visita, cuerpo) => {
   ocupadaId.value = visita.id;
+
   try {
     const { data } = await miApi.patch(`visitas/${visita.id}`, cuerpo);
     reemplazar(data);
+
     return data;
   } catch (error) {
     useAlert(
       error?.response?.data?.error || t('PORTELIA.AGENDA.ERROR_GUARDAR')
     );
+
     return null;
   } finally {
     ocupadaId.value = '';
@@ -111,11 +131,15 @@ const patch = async (visita, cuerpo) => {
 // Cancelar pide motivo antes; realizada abre la Reacción después (ticket 07, punto 3).
 const mover = async (visita, estado) => {
   seleccionada.value = visita;
+
   if (estado === 'cancelada') {
     cancelarRef.value?.abrir();
+
     return;
   }
+
   const movida = await patch(visita, { estado });
+
   if (movida && estado === 'realizada')
     nuevaReaccionRef.value?.abrir(visita.propiedadId);
 };
@@ -125,6 +149,7 @@ const cancelar = async motivoCancelacion => {
     estado: 'cancelada',
     motivoCancelacion,
   });
+
   if (movida) cancelarRef.value?.cerrar();
 };
 

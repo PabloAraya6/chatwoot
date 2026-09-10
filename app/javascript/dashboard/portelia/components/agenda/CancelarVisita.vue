@@ -10,7 +10,9 @@ const emit = defineEmits(['cancelar']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const motivo = ref('');
+
 const guardando = ref(false);
 
 const vacio = computed(() => !motivo.value.trim());

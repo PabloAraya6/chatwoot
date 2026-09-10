@@ -26,13 +26,19 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
 const router = useRouter();
+
 const { accountScopedRoute } = useAccount();
 
 const esNueva = computed(() => !props.propiedadId);
+
 const cargando = ref(!esNueva.value);
+
 const guardando = ref(false);
+
 const error = ref('');
+
 const original = ref(null);
 
 // Los campos del formulario son texto; se vuelven números y listas al guardar. Los que la
@@ -46,6 +52,7 @@ const NUMERICOS = [
   'dormitorios',
   'banos',
 ];
+
 const TEXTOS = [
   'direccion',
   'zona',
@@ -69,6 +76,7 @@ const campos = reactive({
 
 const tituloMiga = () => {
   if (esNueva.value) return t('PORTELIA.PROPIEDADES.FORMULARIO.NUEVA');
+
   return original.value ? tituloDe(original.value, t) : '';
 };
 
@@ -102,6 +110,7 @@ const aPropiedad = () => {
     amenities: lineas(campos.amenities),
     fotos: lineas(campos.fotos),
   };
+
   if (campos.moneda) propiedad.moneda = campos.moneda;
   NUMERICOS.forEach(campo => {
     if (String(campos[campo]).trim() !== '')
@@ -110,6 +119,7 @@ const aPropiedad = () => {
   TEXTOS.forEach(campo => {
     if (campos[campo].trim()) propiedad[campo] = campos[campo].trim();
   });
+
   return propiedad;
 };
 
@@ -134,6 +144,7 @@ const desdePropiedad = propiedad => {
 const delta = () => {
   const ahora = aPropiedad();
   const antes = original.value;
+
   return Object.fromEntries(
     Object.entries(ahora).filter(
       ([campo, valor]) => JSON.stringify(valor) !== JSON.stringify(antes[campo])
@@ -165,10 +176,12 @@ const guardar = async () => {
   if (guardando.value) return;
   guardando.value = true;
   error.value = '';
+
   try {
     const respuesta = esNueva.value
       ? await miApi.post('propiedades', aPropiedad())
       : await miApi.patch(`propiedades/${props.propiedadId}`, delta());
+
     useAlert(t('PORTELIA.PROPIEDADES.FORMULARIO.GUARDADA'));
     irAFicha(respuesta.data.id);
   } catch (e) {

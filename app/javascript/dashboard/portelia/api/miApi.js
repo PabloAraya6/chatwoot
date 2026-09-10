@@ -6,6 +6,7 @@ import store from 'dashboard/store';
 // `Authorization: Bearer` y no como `api_access_token`: Caddy descarta las cabeceras con
 // guion bajo y la API nunca vería el token.
 const url = ruta => `/mi/api/${ruta}`;
+
 const opciones = () => ({
   headers: {
     Authorization: `Bearer ${store.getters.getCurrentUser.access_token}`,

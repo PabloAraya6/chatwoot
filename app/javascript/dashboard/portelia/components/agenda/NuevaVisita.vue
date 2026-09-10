@@ -24,15 +24,25 @@ const emit = defineEmits(['creada']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const conversaciones = ref([]);
+
 const propiedades = ref([]);
+
 const huecos = ref([]);
+
 const conversacionId = ref('');
+
 const propiedadId = ref('');
+
 const dia = ref(hoy());
+
 const at = ref('');
+
 const cargando = ref(false);
+
 const buscandoHuecos = ref(false);
+
 const guardando = ref(false);
 
 const desdeElHilo = computed(() => props.contactId > 0);
@@ -46,6 +56,7 @@ const opcionesPersona = computed(() =>
       `#${conversacion.id}`,
   }))
 );
+
 const opcionesPropiedad = computed(() =>
   propiedades.value
     .filter(propiedad => propiedad.estado === 'disponible')
@@ -54,15 +65,18 @@ const opcionesPropiedad = computed(() =>
       label: nombrePropiedad(propiedad),
     }))
 );
+
 const opcionesHueco = computed(() =>
   huecos.value.map(hueco => ({ value: hueco.at, label: hueco.etiqueta }))
 );
 
 const contactoElegido = computed(() => {
   if (desdeElHilo.value) return props.contactId;
+
   const conversacion = conversaciones.value.find(
     c => String(c.id) === conversacionId.value
   );
+
   return conversacion?.meta?.sender?.id ?? 0;
 });
 
@@ -72,8 +86,10 @@ const incompleto = computed(
 
 const cargar = async () => {
   cargando.value = true;
+
   try {
     const pedidos = [miApi.get('propiedades')];
+
     if (!desdeElHilo.value)
       pedidos.push(
         ConversationApi.get({ status: 'open', assigneeType: 'me', page: 1 })
@@ -91,8 +107,10 @@ const cargar = async () => {
 const buscarHuecos = async () => {
   at.value = '';
   huecos.value = [];
+
   if (!dia.value) return;
   buscandoHuecos.value = true;
+
   try {
     huecos.value = (await miApi.get(`agenda/huecos?dia=${dia.value}`)).data;
   } catch {
@@ -101,6 +119,7 @@ const buscarHuecos = async () => {
     buscandoHuecos.value = false;
   }
 };
+
 watch(dia, buscarHuecos);
 
 const abrir = () => {
@@ -114,17 +133,20 @@ const abrir = () => {
 
 const guardar = async () => {
   guardando.value = true;
+
   try {
     const conversacion = desdeElHilo.value
       ? props.conversationId
       : Number(conversacionId.value);
+
     const { data } = await miApi.post('visitas', {
       contactId: contactoElegido.value,
-      ...(conversacion ? { conversationId: conversacion } : {}),
+      conversationId: conversacion || undefined,
       propiedadId: propiedadId.value,
       at: at.value,
       duracionMin: 30,
     });
+
     emit('creada', data);
     dialogRef.value?.close();
   } catch (error) {

@@ -7,5 +7,6 @@ import { usePorteliaUi } from './usePorteliaUi';
 export const useBarraInferior = () => {
   const route = useRoute();
   const hasPorteliaUi = usePorteliaUi();
+
   return computed(() => hasPorteliaUi.value && !route.params.conversation_id);
 };

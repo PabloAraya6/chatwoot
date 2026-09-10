@@ -9,6 +9,7 @@ export const useEntradasAsesor = () => {
   const { t } = useI18n();
   const { accountScopedRoute } = useAccount();
   const { isAdmin } = useAdmin();
+
   return computed(() => [
     {
       name: 'Bandeja',

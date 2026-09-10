@@ -7,7 +7,9 @@ import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 // El `share_target` del manifest no puede saber la cuenta: esta ruta sin cuenta recibe el
 // link compartido desde el celular y lo lleva a Propiedades de la cuenta del usuario.
 const route = useRoute();
+
 const router = useRouter();
+
 const usuario = useMapGetter('getCurrentUser');
 
 onMounted(() =>

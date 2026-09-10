@@ -4,6 +4,7 @@
 // Siempre se muestra algo: WebKit revoca la suscripción si un push no termina en notificación.
 self.addEventListener('push', event => {
   let datos = {};
+
   try {
     datos = event.data.json();
   } catch {
@@ -32,8 +33,10 @@ self.addEventListener('notificationclick', event => {
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then(ventanas => {
         const ventana = ventanas[0];
+
         if (ventana)
           return ventana.focus().then(enfocada => enfocada.navigate(url));
+
         return clients.openWindow(url);
       })
   );

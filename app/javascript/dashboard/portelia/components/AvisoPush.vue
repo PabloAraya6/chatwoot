@@ -12,6 +12,7 @@ import {
 // lo haya negado. `subscribe` pide el permiso solo: sin `requestPermission` antes, que en el
 // iPhone puede dejar al `subscribe` fuera del gesto.
 const { t } = useI18n();
+
 const visible = ref(false);
 
 const puedePedir = () =>
@@ -31,10 +32,12 @@ onMounted(() => {
 const activar = async () => {
   try {
     const registration = await navigator.serviceWorker.ready;
+
     const suscripcion = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: window.chatwootConfig.vapidPublicKey,
     });
+
     await sendRegistrationToServer(suscripcion);
     visible.value = false;
   } catch (error) {

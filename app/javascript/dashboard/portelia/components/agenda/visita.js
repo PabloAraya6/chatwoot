@@ -37,6 +37,7 @@ const formatoHora = new Intl.DateTimeFormat('es-AR', {
   minute: '2-digit',
   hourCycle: 'h23',
 });
+
 const formatoDia = new Intl.DateTimeFormat('es-AR', {
   weekday: 'long',
   day: 'numeric',

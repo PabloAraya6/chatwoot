@@ -10,7 +10,9 @@ export const TIPOS = [
   'finca',
   'oficina',
 ];
+
 export const OPERACIONES = ['venta', 'alquiler', 'temporario', 'proyecto'];
+
 export const ESTADOS = [
   'disponible',
   'reservada',
@@ -18,6 +20,7 @@ export const ESTADOS = [
   'vendida',
   'suspendida',
 ];
+
 export const MONEDAS = ['ARS', 'USD'];
 
 export const COLOR_ESTADO = {
@@ -47,8 +50,10 @@ export const precioDe = (propiedad, t) => {
   if (propiedad.precio === undefined || !propiedad.moneda) {
     return t('PORTELIA.PROPIEDADES.PRECIO_CONSULTAR');
   }
+
   // Un temporario se cotiza por día o por semana según el aviso; sin ese dato no se inventa.
   const porMes = propiedad.operacion === 'alquiler';
+
   return `${propiedad.moneda} ${propiedad.precio.toLocaleString('es-AR')}${
     porMes ? t('PORTELIA.PROPIEDADES.POR_MES') : ''
   }`;
@@ -57,9 +62,9 @@ export const precioDe = (propiedad, t) => {
 // Un aviso compartido desde Android llega en `url` o adentro de `text`.
 export const urlCompartida = query => {
   const candidata = [query.url, query.text]
-    .filter(Boolean)
-    .map(String)
+    .flatMap(valor => (valor ? [String(valor)] : []))
     .join(' ')
     .match(/https?:\/\/\S+/);
+
   return candidata ? candidata[0] : '';
 };

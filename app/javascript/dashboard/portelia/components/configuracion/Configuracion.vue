@@ -19,9 +19,13 @@ const { t } = useI18n();
 const MODOS = ['siempre', 'fuera_de_horario', 'off'];
 
 const cargando = ref(true);
+
 const guardando = ref(false);
+
 const error = ref('');
+
 const cuenta = ref(null);
+
 const gasto = ref(null);
 
 const campos = reactive({
@@ -46,7 +50,9 @@ const usd = valor => Number(valor).toFixed(2);
 
 const consumoConversacion = computed(() => {
   const masCara = gasto.value?.conversacionMasCara;
+
   if (!masCara) return t('PORTELIA.CONFIGURACION.GASTO.SIN_GASTO');
+
   return t('PORTELIA.CONFIGURACION.GASTO.MAS_CARA', {
     usd: usd(masCara.costoUsd),
     id: masCara.conversationId,
@@ -56,6 +62,7 @@ const consumoConversacion = computed(() => {
 const consumoMes = computed(() => {
   if (!gasto.value || gasto.value.conversaciones === 0)
     return t('PORTELIA.CONFIGURACION.GASTO.SIN_GASTO');
+
   return t('PORTELIA.CONFIGURACION.GASTO.DEL_MES', {
     usd: usd(gasto.value.totalUsd),
     n: gasto.value.conversaciones,
@@ -86,6 +93,7 @@ const cargar = async () => {
       miApi.get('cuenta'),
       miApi.get('cuenta/gasto'),
     ]);
+
     cuenta.value = respuestaCuenta.data;
     gasto.value = respuestaGasto.data;
     desdeCuenta(cuenta.value);
@@ -100,6 +108,7 @@ const guardar = async () => {
   if (guardando.value) return;
   guardando.value = true;
   error.value = '';
+
   try {
     cuenta.value = (await miApi.put('cuenta', aCuenta())).data;
     desdeCuenta(cuenta.value);

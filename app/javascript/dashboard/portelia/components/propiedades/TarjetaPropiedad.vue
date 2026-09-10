@@ -12,14 +12,19 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
 const { accountScopedRoute } = useAccount();
 
 const destino = computed(() =>
   accountScopedRoute('portelia_propiedad', { propiedadId: props.propiedad.id })
 );
+
 const foto = computed(() => props.propiedad.fotos[0]);
+
 const titulo = computed(() => tituloDe(props.propiedad, t));
+
 const lugar = computed(() => lugarDe(props.propiedad));
+
 const precio = computed(() => precioDe(props.propiedad, t));
 </script>
 

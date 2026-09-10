@@ -38,10 +38,12 @@ const SEPARADOR = ', ';
 
 export const atributoDe = (busqueda, definicion, etiqueta) => {
   const crudo = busqueda[definicion.campo];
+
   const value =
     definicion.tipo === 'lista-texto'
       ? (crudo ?? []).join(SEPARADOR)
       : (crudo ?? '');
+
   return {
     attributeKey: definicion.campo,
     attributeDisplayName: etiqueta,
@@ -56,6 +58,7 @@ export const atributoDe = (busqueda, definicion, etiqueta) => {
 // separada por comas y viaja como array.
 export const valorParaApi = (definicion, emitido) => {
   if (definicion.tipo !== 'lista-texto') return emitido;
+
   return String(emitido)
     .split(',')
     .map(parte => parte.trim())
