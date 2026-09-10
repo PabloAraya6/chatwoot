@@ -51,8 +51,9 @@ aparece al recargar, no en vivo; lo que hace el taller sí es en vivo.
   `chatwoot-portelia:taller` (`docker/Dockerfile` con `RAILS_ENV=development`, unos 15
   minutos) y arranca los tres servicios. `bin/portelia-dev up -d` en segundo plano,
   `bin/portelia-dev logs -f rails-taller`, `bin/portelia-dev down`.
-- `bin/portelia-dev build` cuando cambian `Gemfile.lock` o el `Dockerfile`; un cambio en
-  `package.json` lo instala Vite al arrancar.
+- `bin/portelia-dev build` cuando cambian `Gemfile.lock`, `pnpm-lock.yaml` o el `Dockerfile`:
+  `node_modules` y los gems viven en la imagen (un `pnpm install` al arrancar el contenedor se
+  colgaba sin log).
 - Los servicios se llaman `rails-taller`, `sidekiq-taller` y `vite-taller` porque están en
   la red `chatwoot_default` del laboratorio y GOWA le pega a `rails:3000`.
 - La Mac no tiene Ruby 3.4, por eso Rails corre en contenedor. Vite también, para que
