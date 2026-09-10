@@ -20,7 +20,7 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/services/notification/push_notification_service.rb` | `body` en el payload del push web: el service worker no puede autenticar contra la API para buscar el mensaje. |
 | `public/sw.js` | El push muestra cuerpo, ícono y badge, y siempre muestra algo (WebKit revoca la suscripción si un push no termina en notificación); al tocarla enfoca la PWA y navega al hilo, en vez de abrir una ventana nueva salvo que esa URL exacta ya estuviera abierta. |
 | `app/javascript/dashboard/components/ChatListHeader.vue` | Con el flag no muestra el botón de filtros avanzados. |
-| `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes. |
+| `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes (dueño, Tomar, la nota de traspaso y, si un humano ya habló, el aviso de que la secretaria calla con el botón para devolvérsela). |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer` y `rutasSinCuenta` (`/app/compartir`, el destino del `share_target`) al nivel de arriba. |
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
 | `app/views/layouts/vueapp.html.erb` | `theme-color` y `msapplication-TileColor` de la marca (`#014CA1`). |

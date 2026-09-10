@@ -1,12 +1,14 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAccount } from 'dashboard/composables/useAccount';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 
 // Las cinco entradas del asesor, una sola lista para el sidebar de escritorio y la barra
-// inferior del celular.
+// inferior del celular. Configuración es de la Cuenta: sólo la ve un administrador.
 export const useEntradasAsesor = () => {
   const { t } = useI18n();
   const { accountScopedRoute } = useAccount();
+  const { isAdmin } = useAdmin();
   return computed(() => [
     {
       name: 'Bandeja',
@@ -39,11 +41,15 @@ export const useEntradasAsesor = () => {
       icon: 'i-lucide-calendar',
       to: accountScopedRoute('portelia_agenda'),
     },
-    {
-      name: 'Configuracion',
-      label: t('PORTELIA.SIDEBAR.CONFIGURACION'),
-      icon: 'i-lucide-settings',
-      to: accountScopedRoute('portelia_configuracion'),
-    },
+    ...(isAdmin.value
+      ? [
+          {
+            name: 'Configuracion',
+            label: t('PORTELIA.SIDEBAR.CONFIGURACION'),
+            icon: 'i-lucide-settings',
+            to: accountScopedRoute('portelia_configuracion'),
+          },
+        ]
+      : []),
   ]);
 };

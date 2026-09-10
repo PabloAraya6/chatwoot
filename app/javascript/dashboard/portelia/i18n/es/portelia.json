@@ -15,7 +15,11 @@
       "MIO": "La atendés vos",
       "OTRO": "La atiende {nombre}",
       "TOMAR": "Tomar",
-      "TRASPASO": "La secretaria te la pasa."
+      "TRASPASO": "La secretaria te la pasa.",
+      "CALLA": "La secretaria calla en esta conversación.",
+      "DEVOLVER": "Devolvérsela",
+      "DEVUELTA": "La secretaria retoma la conversación; queda sin asignar.",
+      "DEVOLVER_ERROR": "No se pudo devolver la conversación."
     },
     "PUSH": {
       "AVISO": "Activá los avisos para recibir el traspaso en el celular con la Bandeja cerrada.",
@@ -208,6 +212,43 @@
           "caida": "caída"
         }
       }
+    },
+    "CONFIGURACION": {
+      "TITULO": "Configuración",
+      "DESCRIPCION": "Cómo trabaja la secretaria en esta cuenta. Lo que guardás rige desde el próximo mensaje.",
+      "SECRETARIA": {
+        "TITULO": "La secretaria",
+        "DESCRIPCION": "Atiende las conversaciones sin asignar del WhatsApp, arma la Búsqueda y te las pasa cuando vale la pena que entres vos."
+      },
+      "MODO": {
+        "LABEL": "Cuándo atiende",
+        "siempre": "Siempre",
+        "fuera_de_horario": "Sólo fuera de horario",
+        "off": "Apagada"
+      },
+      "HORARIO": {
+        "SEMANA": "Horario de lunes a viernes",
+        "SABADOS": "Sábados",
+        "DOMINGOS": "Domingos",
+        "AYUDA": "Ventanas separadas por coma, por ejemplo 09:00-13:00,17:00-20:30. Vacío es cerrado todo el día."
+      },
+      "NOMBRE_ASESOR": "Cómo te presenta",
+      "NOMBRE_ASESOR_AYUDA": "El nombre con el que la secretaria habla de vos.",
+      "COMO_RESPONDEMOS": "Cómo respondemos",
+      "COMO_RESPONDEMOS_AYUDA": "Tono, requisitos y lo que siempre hay que decir. Entra en cada respuesta.",
+      "GASTO": {
+        "TITULO": "Techo de gasto",
+        "DESCRIPCION": "Lo que la IA puede gastar. Al llegar al techo de una conversación te la pasa; al del mes, calla hasta el mes siguiente.",
+        "POR_CONVERSACION": "Por conversación (USD)",
+        "POR_MES": "Por mes (USD)",
+        "MAS_CARA": "La más cara este mes: USD {usd} (#{id}).",
+        "DEL_MES": "Este mes: USD {usd} en {n} conversaciones.",
+        "SIN_GASTO": "Sin gasto este mes."
+      },
+      "GUARDAR": "Guardar",
+      "GUARDADO": "Configuración guardada.",
+      "ERROR": "No se pudo guardar.",
+      "ERROR_CARGA": "No se pudo cargar la configuración."
     }
   }
 }
