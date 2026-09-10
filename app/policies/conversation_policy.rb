@@ -14,7 +14,7 @@ class ConversationPolicy < ApplicationPolicy
   private
 
   def agent_can_view_conversation?
-    inbox_access? || team_access?
+    (inbox_access? || team_access?) && (assigned_to_user? || unassigned_conversation? || participant?)
   end
 
   def administrator?
@@ -41,6 +41,10 @@ class ConversationPolicy < ApplicationPolicy
 
   def participant?
     record.conversation_participants.exists?(user_id: user.id)
+  end
+
+  def unassigned_conversation?
+    record.assignee_id.nil? && record.assignee_agent_bot_id.nil?
   end
 end
 
