@@ -15,6 +15,9 @@ export TALLER="${TALLER:-0}"
 export PUERTO_RAILS=$((3020 + TALLER))
 export PUERTO_VITE=$((3036 + TALLER))
 export PUERTO_API="${PUERTO_API:-$((3002 + TALLER))}"
+# Una base de Redis por taller: las colas de Sidekiq viven ahí, y si dos talleres compartieran
+# la misma, el Sidekiq de uno correría los jobs del otro con su código. El laboratorio usa la 0.
+export REDIS_DB=$((1 + TALLER))
 compose() { docker compose -p "taller-$TALLER" -f docker-compose.portelia.yaml "$@"; }
 # El volumen node_modules se llena desde la imagen la primera vez: un solo contenedor primero,
 # porque tres a la vez pisándose los symlinks de pnpm rompen el arranque.

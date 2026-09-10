@@ -23,7 +23,7 @@ describe Notification::PushNotificationService do
           create(:notification_subscription, user: notification.user)
 
           described_class.new(notification: notification).perform
-          expect(WebPush).to have_received(:payload_send)
+          expect(WebPush).to have_received(:payload_send).with(hash_including(message: include('"body":')))
           expect(Notification::FcmService).not_to have_received(:new)
           expect(Rails.logger).to have_received(:info).with("Browser push sent to #{user.email} with title #{notification.push_message_title}")
         end

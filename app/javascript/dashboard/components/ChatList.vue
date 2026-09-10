@@ -54,6 +54,7 @@ import { CONVERSATION_EVENTS } from '../helper/AnalyticsHelper/events';
 import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.js';
 import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
 import { pestanasAsesor } from 'dashboard/portelia/bandeja';
+import AvisoPush from 'dashboard/portelia/components/AvisoPush.vue';
 
 const props = defineProps({
   conversationInbox: { type: [String, Number], default: 0 },
@@ -913,6 +914,7 @@ watch(conversationFilters, (newVal, oldVal) => {
       @reset-filters="resetAndFetchData"
       @basic-filter-change="onBasicFilterChange"
     />
+    <AvisoPush v-if="hasPorteliaUi" />
 
     <TeleportWithDirection
       v-if="showAddFoldersModal"

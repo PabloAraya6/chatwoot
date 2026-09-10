@@ -17,6 +17,10 @@
       "TOMAR": "Tomar",
       "TRASPASO": "La secretaria te la pasa."
     },
+    "PUSH": {
+      "AVISO": "Activá los avisos para recibir el traspaso en el celular con la Bandeja cerrada.",
+      "ACTIVAR": "Activar"
+    },
     "PENDIENTE": {
       "DETALLE": "Esta pantalla llega en un ticket próximo del mapa."
     }

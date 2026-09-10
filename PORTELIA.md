@@ -16,7 +16,9 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/featureFlags.js` | Espejo del flag: `FEATURE_FLAGS.PORTELIA_UI`. |
 | `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` | Con el flag prendido renderiza `SidebarAsesor` en lugar de `menuItems` (`usePorteliaUi`, `v-if`/`v-else` en el `<nav>`) y en el celular se esconde (`max-md:hidden`): la barra inferior lo reemplaza. |
 | `app/javascript/dashboard/routes/dashboard/Dashboard.vue` | Con el flag, en el celular monta `BarraInferiorAsesor` en vez de `MobileSidebarLauncher` y le deja lugar abajo al `<main>` (`useBarraInferior`). |
-| `app/javascript/dashboard/components/ChatList.vue` | Con el flag, las pestañas son Mías y Guardia (`pestanasAsesor` sobre `assigneeTabItems`). |
+| `app/javascript/dashboard/components/ChatList.vue` | Con el flag, las pestañas son Mías y Guardia (`pestanasAsesor` sobre `assigneeTabItems`) y debajo del encabezado va `AvisoPush`, el botón que pide el permiso de push. |
+| `app/services/notification/push_notification_service.rb` | `body` en el payload del push web: el service worker no puede autenticar contra la API para buscar el mensaje. |
+| `public/sw.js` | El push muestra cuerpo, ícono y badge, y siempre muestra algo (WebKit revoca la suscripción si un push no termina en notificación); al tocarla enfoca la PWA y navega al hilo, en vez de abrir una ventana nueva salvo que esa URL exacta ya estuviera abierta. |
 | `app/javascript/dashboard/components/ChatListHeader.vue` | Con el flag no muestra el botón de filtros avanzados. |
 | `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes. |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer`. |
@@ -50,8 +52,9 @@ con hot reload, en contenedores de desarrollo con este repo montado, sobre el Po
 Redis del laboratorio (`LABORATORIO`, por defecto `~/Projects/chatwoot`, que tiene que estar corriendo
 con `docker compose -f docker-compose.production.yaml up`). Comparten la base
 `chatwoot_production` y el `.env` del laboratorio; el Redis es el mismo servidor pero la base
-`/1`, así las colas, la caché y el cable del taller no se cruzan con el Sidekiq del
-laboratorio. Consecuencia: lo que entra por GOWA lo procesa el laboratorio y en el taller
+`/(1+N)` (`/1` para el taller sin sufijo), así las colas, la caché y el cable de cada taller no se
+cruzan ni con el Sidekiq del laboratorio ni con el de otro taller, que correría sus jobs con
+otro código. Consecuencia: lo que entra por GOWA lo procesa el laboratorio y en el taller
 aparece al recargar, no en vivo; lo que hace el taller sí es en vivo.
 
 - `bin/portelia-dev` (equivale a `up`): la primera vez construye la imagen
