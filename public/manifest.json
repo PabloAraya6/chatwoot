@@ -3,6 +3,11 @@
   "short_name": "Estudio 3",
   "display": "standalone",
   "start_url": "/app",
+  "share_target": {
+    "action": "/app/compartir",
+    "method": "GET",
+    "params": { "url": "url", "text": "text" }
+  },
   "theme_color": "#014CA1",
   "background_color": "#FFFFFF",
   "icons": [

@@ -19,10 +19,10 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/components/ChatList.vue` | Con el flag, las pestañas son Mías y Guardia (`pestanasAsesor` sobre `assigneeTabItems`). |
 | `app/javascript/dashboard/components/ChatListHeader.vue` | Con el flag no muestra el botón de filtros avanzados. |
 | `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes. |
-| `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer`. |
+| `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer` y `rutasSinCuenta` (`/app/compartir`, el destino del `share_target`) al nivel de arriba. |
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
 | `app/views/layouts/vueapp.html.erb` | `theme-color` y `msapplication-TileColor` de la marca (`#014CA1`). |
-| `public/manifest.json`, `public/*-icon-*.png`, `public/favicon*.png` | La marca de `deploy/brand` del monorepo (nombre, `theme_color`, íconos) más los 512 normal y `maskable`, que upstream no trae. La fuente sigue siendo `deploy/brand`; acá van copiados para que el fork solo ya se instale con marca. |
+| `public/manifest.json`, `public/*-icon-*.png`, `public/favicon*.png` | La marca de `deploy/brand` del monorepo (nombre, `theme_color`, íconos) más los 512 normal y `maskable`, que upstream no trae, y `share_target` hacia `/app/compartir` (compartir un aviso desde Android abre Propiedades e importa). La fuente sigue siendo `deploy/brand`; acá van copiados para que el fork solo ya se instale con marca. |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
 `docker-compose.portelia.yaml`, `Caddyfile.taller`, `public/android-icon-512x512.png`,
