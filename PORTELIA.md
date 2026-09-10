@@ -19,7 +19,7 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
-`docker-compose.portelia.yaml`.
+`docker-compose.portelia.yaml`, `Caddyfile.taller`.
 
 ## Regla de nombres
 
@@ -38,9 +38,9 @@ bin/portelia-dev exec rails-taller bundle exec rails runner "Account.find(6).ena
 
 ## El taller
 
-`bin/portelia-dev` levanta Rails (`http://localhost:3020`), Sidekiq y Vite con hot reload
-en contenedores de desarrollo, con este repo montado, sobre el Postgres y el Redis del
-laboratorio (`LABORATORIO`, por defecto `~/Projects/chatwoot`, que tiene que estar corriendo
+`bin/portelia-dev` levanta Caddy (`http://localhost:3020`) delante de Rails, más Sidekiq y Vite
+con hot reload, en contenedores de desarrollo con este repo montado, sobre el Postgres y el
+Redis del laboratorio (`LABORATORIO`, por defecto `~/Projects/chatwoot`, que tiene que estar corriendo
 con `docker compose -f docker-compose.production.yaml up`). Comparten la base
 `chatwoot_production` y el `.env` del laboratorio; el Redis es el mismo servidor pero la base
 `/1`, así las colas, la caché y el cable del taller no se cruzan con el Sidekiq del
@@ -51,6 +51,13 @@ aparece al recargar, no en vivo; lo que hace el taller sí es en vivo.
   `chatwoot-portelia:taller` (`docker/Dockerfile` con `RAILS_ENV=development`, unos 15
   minutos) y arranca los tres servicios. `bin/portelia-dev up -d` en segundo plano,
   `bin/portelia-dev logs -f rails-taller`, `bin/portelia-dev down`.
+- Caddy (`Caddyfile.taller`) manda `/mi/*` a la API propia (`apps/api` del monorepo) corriendo en
+  la Mac en el puerto 3002 (`pnpm --filter @portelia/api start`) y el resto a Rails, igual que el
+  `deploy/Caddyfile` de producción. Sin la API levantada, `/mi/api` devuelve 502.
+- `TALLER=N bin/portelia-dev` levanta otro taller aparte (proyecto `taller-N`, puertos `3020+N`
+  para Caddy, `3036+N` para el HMR de Vite y `3002+N` para la API; `PUERTO_API` lo cambia). Sirve
+  para trabajar varios worktrees del fork a la vez (`git worktree add ../chatwoot-portelia-N -b
+  <rama> portelia`); cada uno pesa 1,4 GB y Docker tiene 7,6 GB, así que tres es el techo.
 - `bin/portelia-dev build` cuando cambian `Gemfile.lock`, `pnpm-lock.yaml` o el `Dockerfile`:
   `node_modules` y los gems viven en la imagen (un `pnpm install` al arrancar el contenedor se
   colgaba sin log).

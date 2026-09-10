@@ -1,8 +1,21 @@
-# El taller: Rails, Sidekiq y Vite de desarrollo con este repo montado, sobre el Postgres y el
-# Redis del laboratorio (LABORATORIO=~/Projects/chatwoot). Lo levanta bin/portelia-dev.
-# Los servicios no se llaman rails, sidekiq ni vite porque comparten la red del laboratorio
-# y GOWA le pega a `rails:3000`.
+# El taller: Caddy, Rails, Sidekiq y Vite de desarrollo con este repo montado, sobre el Postgres y
+# el Redis del laboratorio (LABORATORIO=~/Projects/chatwoot). Lo levanta bin/portelia-dev, que
+# fija TALLER (el sufijo) y los puertos; varios talleres conviven en la misma red porque cada uno
+# se nombra por su sufijo. Los servicios no se llaman rails, sidekiq ni vite porque comparten la
+# red del laboratorio y GOWA le pega a `rails:3000`.
 services:
+  caddy-taller:
+    image: caddy:2-alpine
+    volumes:
+      - ./Caddyfile.taller:/etc/caddy/Caddyfile:ro
+    environment:
+      TALLER: ${TALLER}
+      PUERTO_API: ${PUERTO_API}
+    networks: [laboratorio]
+    ports:
+      - '127.0.0.1:${PUERTO_RAILS}:80'
+    depends_on: [rails-taller]
+
   rails-taller: &taller
     build:
       context: .
@@ -20,22 +33,23 @@ services:
       NODE_ENV: development
       POSTGRES_DATABASE: chatwoot_production
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
-      FRONTEND_URL: http://localhost:3020
-      VITE_RUBY_HOST: vite-taller
+      FRONTEND_URL: http://localhost:${PUERTO_RAILS}
+      VITE_RUBY_HOST: vite-taller-${TALLER}
+      VITE_RUBY_PORT: ${PUERTO_VITE}
     volumes:
       - ./:/app:delegated
       - node_modules:/app/node_modules
       - cache:/app/tmp/cache
-    networks: [laboratorio]
-    ports:
-      - '127.0.0.1:3020:3000'
+    networks:
+      laboratorio:
+        aliases: ['rails-taller-${TALLER}']
     depends_on: [vite-taller]
     entrypoint: docker/entrypoints/rails.sh
     command: [bundle, exec, rails, s, -p, '3000', -b, 0.0.0.0]
 
   sidekiq-taller:
     <<: *taller
-    ports: []
+    networks: [laboratorio]
     depends_on: []
     entrypoint: []
     command: [bundle, exec, sidekiq, -C, config/sidekiq.yml]
@@ -45,9 +59,12 @@ services:
     environment:
       <<: *entorno
       VITE_RUBY_HOST: 0.0.0.0
-      __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: vite-taller
+      __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: vite-taller-${TALLER}
+    networks:
+      laboratorio:
+        aliases: ['vite-taller-${TALLER}']
     ports:
-      - '127.0.0.1:3036:3036'
+      - '127.0.0.1:${PUERTO_VITE}:${PUERTO_VITE}'
     depends_on: []
     entrypoint: []
     command: [bin/vite, dev]

@@ -1,0 +1,8 @@
+# El frente del taller: /mi/* va a la API propia (apps/api del monorepo) corriendo en la Mac,
+# el resto a Rails. Es lo mismo que hace deploy/Caddyfile en producción, con el sufijo del taller.
+:80 {
+	handle /mi/* {
+		reverse_proxy host.docker.internal:{$PUERTO_API}
+	}
+	reverse_proxy rails-taller-{$TALLER}:3000
+}
