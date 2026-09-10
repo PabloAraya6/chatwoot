@@ -23,6 +23,7 @@ import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
 import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
 import SidebarAsesor from 'dashboard/portelia/components/SidebarAsesor.vue';
+import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
 import {
   SIDEBAR_SORT_SECTIONS,
   getSidebarSortOptions,
@@ -94,12 +95,7 @@ const hasFilteredUnreadCounts = computed(() => {
   );
 });
 
-const hasPorteliaUi = computed(() => {
-  return isFeatureEnabledonAccount.value(
-    accountId.value,
-    FEATURE_FLAGS.PORTELIA_UI
-  );
-});
+const hasPorteliaUi = usePorteliaUi();
 
 const hasDataImport = computed(() => {
   return isFeatureEnabledonAccount.value(
@@ -968,6 +964,7 @@ const menuItems = computed(() => {
       {
         'shadow-lg md:shadow-none': isMobileSidebarOpen,
         'ltr:-translate-x-full rtl:translate-x-full': !isMobileSidebarOpen,
+        'max-md:hidden': hasPorteliaUi,
         'transition-transform duration-200 ease-out md:transition-[width]':
           !isResizing,
       },

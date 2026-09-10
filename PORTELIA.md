@@ -14,12 +14,19 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `config/features.yml` | El flag `portelia_ui`, al final, `column: feature_flags_ext_1`. |
 | `docker/Dockerfile` | `.git_sha` cae al build arg `GIT_SHA` cuando `git rev-parse` no puede (worktree o contexto por URL sin `.git`). |
 | `app/javascript/dashboard/featureFlags.js` | Espejo del flag: `FEATURE_FLAGS.PORTELIA_UI`. |
-| `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` | Con el flag prendido renderiza `SidebarAsesor` en lugar de `menuItems` (import, computed `hasPorteliaUi`, `v-if`/`v-else` en el `<nav>`). |
+| `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` | Con el flag prendido renderiza `SidebarAsesor` en lugar de `menuItems` (`usePorteliaUi`, `v-if`/`v-else` en el `<nav>`) y en el celular se esconde (`max-md:hidden`): la barra inferior lo reemplaza. |
+| `app/javascript/dashboard/routes/dashboard/Dashboard.vue` | Con el flag, en el celular monta `BarraInferiorAsesor` en vez de `MobileSidebarLauncher` y le deja lugar abajo al `<main>` (`useBarraInferior`). |
+| `app/javascript/dashboard/components/ChatList.vue` | Con el flag, las pestañas son Mías y Guardia (`pestanasAsesor` sobre `assigneeTabItems`). |
+| `app/javascript/dashboard/components/ChatListHeader.vue` | Con el flag no muestra el botón de filtros avanzados. |
+| `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes. |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer`. |
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
+| `app/views/layouts/vueapp.html.erb` | `theme-color` y `msapplication-TileColor` de la marca (`#014CA1`). |
+| `public/manifest.json`, `public/*-icon-*.png`, `public/favicon*.png` | La marca de `deploy/brand` del monorepo (nombre, `theme_color`, íconos) más los 512 normal y `maskable`, que upstream no trae. La fuente sigue siendo `deploy/brand`; acá van copiados para que el fork solo ya se instale con marca. |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
-`docker-compose.portelia.yaml`, `Caddyfile.taller`.
+`docker-compose.portelia.yaml`, `Caddyfile.taller`, `public/android-icon-512x512.png`,
+`public/maskable-icon-512x512.png`.
 
 ## Regla de nombres
 
@@ -69,12 +76,10 @@ aparece al recargar, no en vivo; lo que hace el taller sí es en vivo.
 
 Usuarios del laboratorio: en la memoria del monorepo (`asesor alfredo.bettio@estudio3.demo`).
 
-Trampa: el laboratorio tiene en `InstallationConfig` `DASHBOARD_SCRIPTS` el script de marca del
-stock (`deploy/brand` del monorepo), que reetiqueta el DOM por `MutationObserver` (Bandeja
-pasa a Consultas, aparecen Mías y Guardia). Como la base es compartida, en el taller también
-corre. Para ver el fork pelado se vacía y se restaura desde el taller:
-`InstallationConfig.find_by(name: 'DASHBOARD_SCRIPTS').update!(value: '')` por rails runner
-(guardar el valor antes). Deja de hacer falta cuando la marca pase al fork.
+`DASHBOARD_SCRIPTS` (el CSS del tema de Estudio 3 más `celo.js`, `apps/api/theme` del monorepo)
+quedó vacío en el laboratorio desde el ticket 04: Mías y Guardia, el dueño del hilo y la marca
+de la PWA ya viven en el fork. Si hiciera falta volver a verlo, `apps/api/theme/build.sh` lo
+regenera y `apply_theme.rb` lo inyecta.
 
 ## Lint y tests
 
