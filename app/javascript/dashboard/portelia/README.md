@@ -5,8 +5,8 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
 `PORTELIA.md` en la raíz del fork.
 
 - `routes/`: rutas propias (`portelia_*`), montadas como hijas de `AppContainer` desde
-  `dashboard.routes.js`. Propiedades es real (lista, ficha, nueva, editar); Agenda y
-  Configuración son placeholders (`PantallaPendiente`); Bandeja y Personas apuntan a las rutas
+  `dashboard.routes.js`. Propiedades (lista, ficha, nueva, editar) y Agenda son reales;
+  Configuración es un placeholder (`PantallaPendiente`); Bandeja y Personas apuntan a las rutas
   stock `home` y `contacts_dashboard_index`. `rutasSinCuenta` tiene `/app/compartir`, adonde
   apunta el `share_target` del manifest.
 - `components/`: componentes nuestros, compuestos con los primitivos y las clases de upstream
@@ -19,7 +19,17 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
   traspaso de la secretaria (`content_attributes.traspaso` de su nota privada). `propiedades/` es
   la pantalla de Propiedades sobre `/mi/api/propiedades` (Button, Input, Select, Dialog, Label,
   CardLayout, Breadcrumb de `components-next`); los enums de la Propiedad viven copiados en
-  `propiedades/propiedad.js` porque el fork no importa del monorepo. `AvisoPush.vue`
+  `propiedades/propiedad.js` porque el fork no importa del monorepo. `agenda/` es la Agenda
+  (ticket 07) sobre `/mi/api/agenda`, `/mi/api/visitas`, `/mi/api/agenda/huecos` y
+  `/mi/api/disponibilidad`: Hoy y la semana como listas de `CardLayout`, los taps de estado
+  que la tabla `agenda/visita.js` permite (copia de `transicionesVisita` del monorepo; la API
+  la vuelve a aplicar y devuelve 409), `NuevaVisita` (Persona desde las conversaciones abiertas
+  del asesor o la del hilo, Propiedad, día y un hueco libre que calcula la API), `CancelarVisita`
+  con motivo, `Disponibilidad` (las franjas semanales, `PUT` de la lista entera) y, al marcar
+  una realizada, `NuevaReaccion` y la pregunta por la Operación reusando los diálogos de
+  `ficha/`. El nombre de la Persona sale del store de contactos de Chatwoot. `ficha/` es la
+  ficha de la Persona en el panel del contacto (Búsqueda editable con procedencia, Visitas con
+  el botón Agendar, Reacciones, Operación). `AvisoPush.vue`
   es el `Banner` de upstream debajo del encabezado de la lista que pide el permiso de push con
   un gesto y guarda la suscripción; desaparece cuando este browser ya está suscripto o el asesor
   lo negó. El service worker que muestra el push es `public/sw.js`.

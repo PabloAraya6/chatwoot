@@ -43,8 +43,9 @@ const visitaRealizada = () =>
     v => v.propiedadId === propiedadId.value && v.estado === 'realizada'
   );
 
-const abrir = () => {
-  propiedadId.value = '';
+// Desde la Agenda llega con la Propiedad de la Visita que se acaba de marcar realizada.
+const abrir = (propiedadInicial = '') => {
+  propiedadId.value = propiedadInicial;
   veredicto.value = '';
   motivo.value = '';
   dialogRef.value?.open();

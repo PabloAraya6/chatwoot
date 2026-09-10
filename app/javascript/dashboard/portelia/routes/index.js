@@ -6,6 +6,7 @@ import ListaPropiedades from '../components/propiedades/ListaPropiedades.vue';
 import FichaPropiedad from '../components/propiedades/FichaPropiedad.vue';
 import FormularioPropiedad from '../components/propiedades/FormularioPropiedad.vue';
 import CompartirAviso from '../components/propiedades/CompartirAviso.vue';
+import Agenda from '../components/agenda/Agenda.vue';
 
 const meta = { permissions: ROLES, featureFlag: FEATURE_FLAGS.PORTELIA_UI };
 
@@ -44,7 +45,13 @@ export const routes = [
     meta,
     props: true,
   },
-  ...['agenda', 'configuracion'].map(pendiente),
+  {
+    path: frontendURL('accounts/:accountId/agenda'),
+    name: 'portelia_agenda',
+    component: Agenda,
+    meta,
+  },
+  pendiente('configuracion'),
 ];
 
 // Fuera de la cuenta: adonde apunta el `share_target` del manifest.

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { useAlert } from 'dashboard/composables';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
@@ -11,6 +12,7 @@ import { fechaCorta, nombrePropiedad, precio } from './formato';
 import CampoBusqueda from './CampoBusqueda.vue';
 import NuevaReaccion from './NuevaReaccion.vue';
 import NuevaOperacion from './NuevaOperacion.vue';
+import NuevaVisita from '../agenda/NuevaVisita.vue';
 
 // La ficha de la Persona (ticket 05): la Búsqueda editable con su procedencia por campo, las
 // Visitas, las Reacciones y la Operación. Se monta en el panel del contacto del hilo y en la
@@ -21,6 +23,12 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+const route = useRoute();
+
+// En el hilo la Visita queda atada a la conversación; en la página Personas no hay ninguna.
+const conversationId = computed(
+  () => Number(route.params.conversation_id) || 0
+);
 
 const cargando = ref(true);
 const fallo = ref(false);
@@ -31,6 +39,7 @@ const operaciones = ref([]);
 const propiedades = ref([]);
 const nuevaReaccionRef = ref(null);
 const nuevaOperacionRef = ref(null);
+const nuevaVisitaRef = ref(null);
 
 const ESTADO_VISITA_COLOR = {
   pendiente: 'amber',
@@ -87,6 +96,14 @@ const editarCampo = async (busqueda, campo, valor) => {
   }
 };
 
+const alCrearVisita = visita => {
+  visitas.value = [
+    ...visitas.value,
+    { ...visita, propiedad: porId.value.get(visita.propiedadId) },
+  ].sort((a, b) => a.at.localeCompare(b.at));
+  useAlert(t('PORTELIA.AGENDA.NUEVA.CREADA'));
+};
+
 const alCrearReaccion = reaccion => {
   reacciones.value = [
     reaccion,
@@ -137,9 +154,19 @@ watch(() => props.contactId, cargar);
       </section>
 
       <section class="flex flex-col gap-2">
-        <h4 class="text-sm font-medium text-n-slate-12">
-          {{ t('PORTELIA.FICHA.VISITAS.TITULO') }}
-        </h4>
+        <div class="flex items-center justify-between">
+          <h4 class="text-sm font-medium text-n-slate-12">
+            {{ t('PORTELIA.FICHA.VISITAS.TITULO') }}
+          </h4>
+          <Button
+            variant="faded"
+            color="slate"
+            size="xs"
+            icon="i-lucide-calendar-plus"
+            :label="t('PORTELIA.AGENDA.NUEVA.AGENDAR')"
+            @click="nuevaVisitaRef?.abrir()"
+          />
+        </div>
         <p v-if="visitas.length === 0" class="text-n-slate-11">
           {{ t('PORTELIA.FICHA.VISITAS.VACIAS') }}
         </p>
@@ -241,6 +268,12 @@ watch(() => props.contactId, cargar);
         </div>
       </section>
 
+      <NuevaVisita
+        ref="nuevaVisitaRef"
+        :contact-id="contactId"
+        :conversation-id="conversationId"
+        @creada="alCrearVisita"
+      />
       <NuevaReaccion
         ref="nuevaReaccionRef"
         :contact-id="contactId"

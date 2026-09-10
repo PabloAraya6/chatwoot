@@ -46,11 +46,12 @@ const alElegirPropiedad = () => {
 };
 watch(propiedadId, alElegirPropiedad);
 
-const abrir = () => {
-  propiedadId.value = '';
+const abrir = (propiedadInicial = '') => {
   tipo.value = '';
   precio.value = '';
   moneda.value = 'USD';
+  propiedadId.value = propiedadInicial;
+  if (propiedadInicial) alElegirPropiedad();
   dialogRef.value?.open();
 };
 
