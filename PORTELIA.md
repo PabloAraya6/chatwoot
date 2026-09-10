@@ -12,6 +12,7 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 |---|---|
 | `app/policies/conversation_policy.rb` | Un agente no abre la conversación asignada a otro (parche previo al mapa). |
 | `config/features.yml` | El flag `portelia_ui`, al final, `column: feature_flags_ext_1`. |
+| `docker/Dockerfile` | `.git_sha` cae al build arg `GIT_SHA` cuando `git rev-parse` no puede (worktree o contexto por URL sin `.git`). |
 | `app/javascript/dashboard/featureFlags.js` | Espejo del flag: `FEATURE_FLAGS.PORTELIA_UI`. |
 | `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` | Con el flag prendido renderiza `SidebarAsesor` en lugar de `menuItems` (import, computed `hasPorteliaUi`, `v-if`/`v-else` en el `<nav>`). |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer`. |

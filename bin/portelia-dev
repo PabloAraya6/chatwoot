@@ -7,4 +7,6 @@ cd "$(dirname "$0")/.."
 export LABORATORIO="${LABORATORIO:-$HOME/Projects/chatwoot}"
 REDIS_PASSWORD="$(grep '^REDIS_PASSWORD=' "$LABORATORIO/.env" | cut -d= -f2-)"
 export REDIS_PASSWORD
+GIT_SHA="$(git rev-parse HEAD)"
+export GIT_SHA
 exec docker compose -f docker-compose.portelia.yaml "${@:-up}"

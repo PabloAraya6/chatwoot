@@ -12,6 +12,7 @@ services:
         EXECJS_RUNTIME: Node
         RAILS_ENV: development
         RAILS_SERVE_STATIC_FILES: 'false'
+        GIT_SHA: ${GIT_SHA}
     image: chatwoot-portelia:taller
     env_file: ${LABORATORIO}/.env
     environment: &entorno
