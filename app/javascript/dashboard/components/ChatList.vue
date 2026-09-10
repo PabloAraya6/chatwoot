@@ -52,6 +52,8 @@ import {
 import { matchesFilters } from '../store/modules/conversations/helpers/filterHelpers';
 import { CONVERSATION_EVENTS } from '../helper/AnalyticsHelper/events';
 import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.js';
+import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
+import { pestanasAsesor } from 'dashboard/portelia/bandeja';
 
 const props = defineProps({
   conversationInbox: { type: [String, Number], default: 0 },
@@ -69,6 +71,7 @@ const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
+const hasPorteliaUi = usePorteliaUi();
 
 const resolveAttributesModalRef = ref(null);
 
@@ -176,7 +179,7 @@ const userPermissions = computed(() => {
 });
 
 const assigneeTabItems = computed(() => {
-  return filterItemsByPermission(
+  const items = filterItemsByPermission(
     ASSIGNEE_TYPE_TAB_PERMISSIONS,
     userPermissions.value,
     item => item.permissions
@@ -185,6 +188,7 @@ const assigneeTabItems = computed(() => {
     name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
     count: conversationStats.value[countKey] || 0,
   }));
+  return hasPorteliaUi.value ? pestanasAsesor(items, t) : items;
 });
 
 const showAssigneeInConversationCard = computed(() => {

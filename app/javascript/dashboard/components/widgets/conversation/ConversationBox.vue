@@ -4,6 +4,8 @@ import ConversationHeader from './ConversationHeader.vue';
 import DashboardAppFrame from '../DashboardApp/Frame.vue';
 import EmptyState from './EmptyState/EmptyState.vue';
 import MessagesView from './MessagesView.vue';
+import TraspasoHilo from 'dashboard/portelia/components/TraspasoHilo.vue';
+import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
 
 export default {
   components: {
@@ -11,6 +13,7 @@ export default {
     DashboardAppFrame,
     EmptyState,
     MessagesView,
+    TraspasoHilo,
   },
   props: {
     inboxId: {
@@ -30,6 +33,9 @@ export default {
       type: Boolean,
       default: true,
     },
+  },
+  setup() {
+    return { hasPorteliaUi: usePorteliaUi() };
   },
   data() {
     return { activeIndex: 0 };
@@ -107,6 +113,7 @@ export default {
         'border-b border-b-n-weak !pt-2': !dashboardApps.length,
       }"
     />
+    <TraspasoHilo v-if="hasPorteliaUi && currentChat.id" :chat="currentChat" />
     <woot-tabs
       v-if="dashboardApps.length && currentChat.id"
       :index="activeIndex"

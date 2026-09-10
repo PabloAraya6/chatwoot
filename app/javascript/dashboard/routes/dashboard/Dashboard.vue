@@ -25,6 +25,8 @@ import CopilotLauncher from 'dashboard/components-next/copilot/CopilotLauncher.v
 import CopilotContainer from 'dashboard/components/copilot/CopilotContainer.vue';
 
 import MobileSidebarLauncher from 'dashboard/components-next/sidebar/MobileSidebarLauncher.vue';
+import BarraInferiorAsesor from 'dashboard/portelia/components/BarraInferiorAsesor.vue';
+import { useBarraInferior } from 'dashboard/portelia/composables/useBarraInferior';
 import { useCallsStore } from 'dashboard/stores/calls';
 
 export default {
@@ -38,6 +40,7 @@ export default {
     CopilotContainer,
     FloatingCallWidget,
     MobileSidebarLauncher,
+    BarraInferiorAsesor,
   },
   setup() {
     const upgradePageRef = ref(null);
@@ -52,6 +55,7 @@ export default {
       accountId,
       upgradePageRef,
       windowWidth,
+      hasBarraInferior: useBarraInferior(),
       hasActiveCall: computed(() => callsStore.hasActiveCall),
       hasIncomingCall: computed(() => callsStore.hasIncomingCall),
     };
@@ -141,6 +145,10 @@ export default {
 
     <main
       class="flex flex-1 h-full w-full min-h-0 px-0 overflow-hidden bg-n-surface-1"
+      :class="{
+        'max-md:pb-[calc(3.5rem+env(safe-area-inset-bottom))]':
+          hasBarraInferior,
+      }"
     >
       <UpgradePage
         v-show="showUpgradePage"
@@ -148,6 +156,7 @@ export default {
         :bypass-upgrade-page="bypassUpgradePage"
       >
         <MobileSidebarLauncher
+          v-if="!hasBarraInferior"
           :is-mobile-sidebar-open="isMobileSidebarOpen"
           @toggle="toggleMobileSidebar"
         />
@@ -155,7 +164,9 @@ export default {
       <template v-if="!showUpgradePage">
         <router-view />
         <CopilotLauncher />
+        <BarraInferiorAsesor v-if="hasBarraInferior" />
         <MobileSidebarLauncher
+          v-else
           :is-mobile-sidebar-open="isMobileSidebarOpen"
           @toggle="toggleMobileSidebar"
         />

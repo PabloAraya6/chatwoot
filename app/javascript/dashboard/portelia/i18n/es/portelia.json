@@ -7,6 +7,16 @@
       "AGENDA": "Agenda",
       "CONFIGURACION": "Configuración"
     },
+    "BANDEJA": {
+      "GUARDIA": "Guardia"
+    },
+    "HILO": {
+      "GUARDIA": "Guardia, sin dueño todavía",
+      "MIO": "La atendés vos",
+      "OTRO": "La atiende {nombre}",
+      "TOMAR": "Tomar",
+      "TRASPASO": "La secretaria te la pasa."
+    },
     "PENDIENTE": {
       "DETALLE": "Esta pantalla llega en un ticket próximo del mapa."
     }
