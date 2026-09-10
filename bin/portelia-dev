@@ -1,0 +1,10 @@
+#!/bin/sh
+# Levanta el taller (PORTELIA.md): Rails en http://localhost:3020 con Vite en hot reload, sobre
+# el Postgres y el Redis del laboratorio. Sin argumentos hace `up`; con argumentos los pasa a
+# docker compose (down, logs -f, exec rails-taller ...).
+set -eu
+cd "$(dirname "$0")/.."
+export LABORATORIO="${LABORATORIO:-$HOME/Projects/chatwoot}"
+REDIS_PASSWORD="$(grep '^REDIS_PASSWORD=' "$LABORATORIO/.env" | cut -d= -f2-)"
+export REDIS_PASSWORD
+exec docker compose -f docker-compose.portelia.yaml "${@:-up}"

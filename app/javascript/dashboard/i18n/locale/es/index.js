@@ -1,3 +1,4 @@
+import portelia from 'dashboard/portelia/i18n/es/portelia.json';
 import advancedFilters from './advancedFilters.json';
 import agentBots from './agentBots.json';
 import agentMgmt from './agentMgmt.json';
@@ -86,4 +87,5 @@ export default {
   ...teamsSettings,
   ...whatsappTemplates,
   ...whatsappTemplateMgmt,
+  ...portelia,
 };

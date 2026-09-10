@@ -1,0 +1,14 @@
+{
+  "PORTELIA": {
+    "SIDEBAR": {
+      "BANDEJA": "Bandeja",
+      "PERSONAS": "Personas",
+      "PROPIEDADES": "Propiedades",
+      "AGENDA": "Agenda",
+      "CONFIGURACION": "Configuración"
+    },
+    "PENDIENTE": {
+      "DETALLE": "Esta pantalla llega en un ticket próximo del mapa."
+    }
+  }
+}

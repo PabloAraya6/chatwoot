@@ -22,6 +22,7 @@ import ChannelIcon from 'next/icon/ChannelIcon.vue';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
 import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
+import SidebarAsesor from 'dashboard/portelia/components/SidebarAsesor.vue';
 import {
   SIDEBAR_SORT_SECTIONS,
   getSidebarSortOptions,
@@ -90,6 +91,13 @@ const hasFilteredUnreadCounts = computed(() => {
       accountId.value,
       FEATURE_FLAGS.UNREAD_COUNT_FOR_FILTERS
     )
+  );
+});
+
+const hasPorteliaUi = computed(() => {
+  return isFeatureEnabledonAccount.value(
+    accountId.value,
+    FEATURE_FLAGS.PORTELIA_UI
   );
 });
 
@@ -1047,11 +1055,14 @@ const menuItems = computed(() => {
         class="flex flex-col gap-1 m-0 list-none min-w-0"
         :class="{ 'items-center': isEffectivelyCollapsed }"
       >
-        <SidebarGroup
-          v-for="item in menuItems"
-          :key="item.name"
-          v-bind="item"
-        />
+        <SidebarAsesor v-if="hasPorteliaUi" />
+        <template v-else>
+          <SidebarGroup
+            v-for="item in menuItems"
+            :key="item.name"
+            v-bind="item"
+          />
+        </template>
       </ul>
     </nav>
     <section
