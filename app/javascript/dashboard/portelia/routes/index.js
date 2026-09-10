@@ -5,16 +5,12 @@ import PantallaPendiente from '../components/PantallaPendiente.vue';
 
 const meta = { permissions: ROLES, featureFlag: FEATURE_FLAGS.PORTELIA_UI };
 
-const pendiente = (camino, titulo) => ({
-  path: frontendURL(`accounts/:accountId/${camino}`),
-  name: `portelia_${camino}`,
+const pendiente = pantalla => ({
+  path: frontendURL(`accounts/:accountId/${pantalla}`),
+  name: `portelia_${pantalla}`,
   component: PantallaPendiente,
   meta,
-  props: { titulo },
+  props: { pantalla },
 });
 
-export const routes = [
-  pendiente('propiedades', 'PORTELIA.SIDEBAR.PROPIEDADES'),
-  pendiente('agenda', 'PORTELIA.SIDEBAR.AGENDA'),
-  pendiente('configuracion', 'PORTELIA.SIDEBAR.CONFIGURACION'),
-];
+export const routes = ['propiedades', 'agenda', 'configuracion'].map(pendiente);

@@ -1,16 +1,24 @@
 <script setup>
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-defineProps({
-  titulo: { type: String, required: true },
+const props = defineProps({
+  pantalla: { type: String, required: true },
 });
 
 const { t } = useI18n();
+
+const titulos = {
+  propiedades: t('PORTELIA.SIDEBAR.PROPIEDADES'),
+  agenda: t('PORTELIA.SIDEBAR.AGENDA'),
+  configuracion: t('PORTELIA.SIDEBAR.CONFIGURACION'),
+};
+const titulo = computed(() => titulos[props.pantalla]);
 </script>
 
 <template>
   <div class="flex flex-col gap-2 p-6 w-full h-full bg-n-background">
-    <h1 class="text-xl font-medium text-n-slate-12">{{ t(titulo) }}</h1>
+    <h1 class="text-xl font-medium text-n-slate-12">{{ titulo }}</h1>
     <p class="text-sm text-n-slate-11">{{ t('PORTELIA.PENDIENTE.DETALLE') }}</p>
   </div>
 </template>
