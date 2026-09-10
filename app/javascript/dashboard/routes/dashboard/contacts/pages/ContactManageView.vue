@@ -14,12 +14,25 @@ import ContactHistory from 'dashboard/components-next/Contacts/ContactsSidebar/C
 import ContactMedia from 'dashboard/components-next/Contacts/ContactsSidebar/ContactMedia.vue';
 import ContactMerge from 'dashboard/components-next/Contacts/ContactsSidebar/ContactMerge.vue';
 import ContactCustomAttributes from 'dashboard/components-next/Contacts/ContactsSidebar/ContactCustomAttributes.vue';
+import FichaPersona from 'dashboard/portelia/components/ficha/FichaPersona.vue';
+import { FEATURE_FLAGS } from 'dashboard/featureFlags';
 
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
 
 const contact = useMapGetter('contacts/getContactById');
+
+// portelia: la ficha propia arriba de los datos del contacto, sólo con el flag prendido
+const isFeatureEnabledonAccount = useMapGetter(
+  'accounts/isFeatureEnabledonAccount'
+);
+const hasPorteliaUi = computed(() =>
+  isFeatureEnabledonAccount.value(
+    route.params.accountId,
+    FEATURE_FLAGS.PORTELIA_UI
+  )
+);
 const uiFlags = useMapGetter('contacts/getUIFlags');
 
 const activeTab = ref('attributes');
@@ -146,11 +159,18 @@ onMounted(() => {
       >
         <Spinner />
       </div>
-      <ContactDetails
-        v-else-if="selectedContact"
-        :selected-contact="selectedContact"
-        @go-to-contacts-list="goToContactsList"
-      />
+      <template v-else-if="selectedContact">
+        <div v-if="hasPorteliaUi" class="pb-6 mb-6 border-b border-n-strong">
+          <h3 class="mb-2 text-base font-medium text-n-slate-12">
+            {{ $t('PORTELIA.FICHA.TITULO') }}
+          </h3>
+          <FichaPersona :contact-id="Number(route.params.contactId)" />
+        </div>
+        <ContactDetails
+          :selected-contact="selectedContact"
+          @go-to-contacts-list="goToContactsList"
+        />
+      </template>
       <template #sidebarHeader>
         <div class="px-6 pt-6 pb-3">
           <TabBar

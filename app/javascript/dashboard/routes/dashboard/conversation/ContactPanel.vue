@@ -24,6 +24,7 @@ import ShopifyOrdersList from 'dashboard/components/widgets/conversation/Shopify
 import SidebarActionsHeader from 'dashboard/components-next/SidebarActionsHeader.vue';
 import LinearIssuesList from 'dashboard/components/widgets/conversation/linear/IssuesList.vue';
 import LinearSetupCTA from 'dashboard/components/widgets/conversation/linear/LinearSetupCTA.vue';
+import FichaPersona from 'dashboard/portelia/components/ficha/FichaPersona.vue';
 
 const props = defineProps({
   conversationId: {
@@ -55,7 +56,15 @@ const isShopifyFeatureEnabled = computed(
   () => shopifyIntegration.value.enabled
 );
 
-const { isCloudFeatureEnabled } = useAccount();
+const { isCloudFeatureEnabled, accountId } = useAccount();
+
+// portelia: la ficha de la Persona es una sección más del panel, sólo con el flag prendido
+const isFeatureEnabledonAccount = useMapGetter(
+  'accounts/isFeatureEnabledonAccount'
+);
+const hasPorteliaUi = computed(() =>
+  isFeatureEnabledonAccount.value(accountId.value, FEATURE_FLAGS.PORTELIA_UI)
+);
 
 const isLinearFeatureEnabled = computed(() =>
   isCloudFeatureEnabled(FEATURE_FLAGS.LINEAR)
@@ -150,8 +159,21 @@ onMounted(() => {
         @end="onDragEnd"
       >
         <template #item="{ element }">
+          <div v-if="element.name === 'portelia_ficha'">
+            <AccordionItem
+              v-if="hasPorteliaUi && contactId"
+              :title="$t('PORTELIA.FICHA.TITULO')"
+              :is-open="!isContactSidebarItemOpen('is_portelia_ficha_closed')"
+              compact
+              @toggle="
+                value => toggleSidebarUIState('is_portelia_ficha_closed', value)
+              "
+            >
+              <FichaPersona :contact-id="contactId" />
+            </AccordionItem>
+          </div>
           <div
-            v-if="element.name === 'conversation_actions'"
+            v-else-if="element.name === 'conversation_actions'"
             class="conversation--actions"
           >
             <AccordionItem

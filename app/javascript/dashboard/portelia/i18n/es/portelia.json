@@ -133,6 +133,77 @@
         "ENVIADA_SIN_FOTO": "Ficha enviada. La foto no se pudo bajar, fue el texto solo.",
         "ERROR": "No se pudo mandar la ficha."
       }
+    },
+    "FICHA": {
+      "TITULO": "Persona",
+      "GUARDAR": "Guardar",
+      "GUARDADO": "Guardado",
+      "AGREGAR": "Agregar",
+      "ELEGIR": "Elegir",
+      "ELEGIR_PROPIEDAD": "Elegir una propiedad",
+      "PROPIEDAD": "Propiedad",
+      "ERROR_CARGAR": "No se pudo cargar la ficha. Probá de nuevo en un momento.",
+      "ERROR_GUARDAR": "No se pudo guardar. Probá de nuevo.",
+      "PROCEDENCIA": {
+        "humano": "asesor",
+        "asistente": "secretaria",
+        "web": "web"
+      },
+      "CAMPOS": {
+        "operacion": "Operación",
+        "tipoPropiedad": "Tipo",
+        "zona": "Zona",
+        "ciudad": "Ciudad",
+        "presupuesto": "Presupuesto",
+        "moneda": "Moneda",
+        "dormitoriosMin": "Dormitorios",
+        "ambientesMin": "Ambientes",
+        "cochera": "Cochera",
+        "requisitos": "Requisitos",
+        "ultimoHablado": "Último hablado"
+      },
+      "BUSQUEDA": {
+        "TITULO": "Búsqueda",
+        "VACIA": "Todavía no hay una Búsqueda: la arma la secretaria con la conversación."
+      },
+      "VISITAS": {
+        "TITULO": "Visitas",
+        "VACIAS": "Sin visitas.",
+        "ESTADO": {
+          "pendiente": "pendiente",
+          "confirmada": "confirmada",
+          "realizada": "realizada",
+          "cancelada": "cancelada",
+          "no_se_presento": "no se presentó"
+        }
+      },
+      "REACCIONES": {
+        "TITULO": "Reacciones",
+        "VACIAS": "Sin reacciones. Después de una visita, anotá qué le pareció.",
+        "NUEVA": "Nueva reacción",
+        "VEREDICTO": "Qué le pareció",
+        "MOTIVO": "Por qué",
+        "MOTIVO_EJEMPLO": "Le quedó chico el patio"
+      },
+      "VEREDICTO": {
+        "le_gusto": "le gustó",
+        "no_le_gusto": "no le gustó",
+        "lo_piensa": "lo piensa"
+      },
+      "OPERACIONES": {
+        "TITULO": "Operación",
+        "VACIAS": "Sin operación.",
+        "CREAR": "Crear",
+        "NUEVA": "Nueva operación",
+        "DESCRIPCION": "Reserva la propiedad y cierra la Búsqueda vigente de esta persona.",
+        "TIPO": "Tipo",
+        "PRECIO": "Precio",
+        "ESTADO": {
+          "reservada": "reservada",
+          "cerrada": "cerrada",
+          "caida": "caída"
+        }
+      }
     }
   }
 }

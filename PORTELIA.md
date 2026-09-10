@@ -23,6 +23,9 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
 | `app/views/layouts/vueapp.html.erb` | `theme-color` y `msapplication-TileColor` de la marca (`#014CA1`). |
 | `public/manifest.json`, `public/*-icon-*.png`, `public/favicon*.png` | La marca de `deploy/brand` del monorepo (nombre, `theme_color`, íconos) más los 512 normal y `maskable`, que upstream no trae, y `share_target` hacia `/app/compartir` (compartir un aviso desde Android abre Propiedades e importa). La fuente sigue siendo `deploy/brand`; acá van copiados para que el fork solo ya se instale con marca. |
+| `app/javascript/dashboard/composables/useUISettings.js` | Suma `portelia_ficha` a `DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER`, arriba de todo. |
+| `app/javascript/dashboard/routes/dashboard/conversation/ContactPanel.vue` | Con el flag, `FichaPersona` como sección `portelia_ficha` del acordeón del panel (import, `hasPorteliaUi`, un `v-if` en el `#item`). |
+| `app/javascript/dashboard/routes/dashboard/contacts/pages/ContactManageView.vue` | Con el flag, `FichaPersona` arriba de los datos del contacto en la página Personas (import, `hasPorteliaUi`, un `v-if`). |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
 `docker-compose.portelia.yaml`, `Caddyfile.taller`, `public/android-icon-512x512.png`,
