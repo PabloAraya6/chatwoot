@@ -16,8 +16,11 @@ const emit = defineEmits(['guardada']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const franjas = ref([]);
+
 const cargando = ref(false);
+
 const guardando = ref(false);
 
 const porDia = computed(() =>
@@ -29,6 +32,7 @@ const porDia = computed(() =>
 
 const invalida = franja =>
   !franja.desde || !franja.hasta || franja.desde >= franja.hasta;
+
 const hayInvalidas = computed(() => franjas.value.some(invalida));
 
 const agregar = diaSemana =>
@@ -41,6 +45,7 @@ const quitar = franja => {
 const abrir = async () => {
   dialogRef.value?.open();
   cargando.value = true;
+
   try {
     franjas.value = (await miApi.get('disponibilidad')).data.map(
       ({ diaSemana, desde, hasta }) => ({ diaSemana, desde, hasta })
@@ -54,10 +59,12 @@ const abrir = async () => {
 
 const guardar = async () => {
   guardando.value = true;
+
   try {
     const { data } = await miApi.put('disponibilidad', {
       franjas: franjas.value,
     });
+
     emit('guardada', data);
     useAlert(t('PORTELIA.AGENDA.FRANJAS.GUARDADAS'));
     dialogRef.value?.close();

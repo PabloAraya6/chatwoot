@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 import { useEntradasAsesor } from '../composables/useEntradasAsesor';
 
 const route = useRoute();
+
 const entradas = useEntradasAsesor();
 
 const activa = entrada =>

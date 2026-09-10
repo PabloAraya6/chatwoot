@@ -16,21 +16,30 @@ import ImportarAvisoDialog from './ImportarAvisoDialog.vue';
 import { ESTADOS, OPERACIONES, opcionesDe, urlCompartida } from './propiedad';
 
 const { t } = useI18n();
+
 const route = useRoute();
+
 const router = useRouter();
+
 const { accountScopedRoute } = useAccount();
 
 const propiedades = ref([]);
+
 const cargando = ref(true);
+
 const busqueda = ref('');
+
 const estado = ref('');
+
 const operacion = ref('');
+
 const importarRef = ref(null);
 
 const opcionesEstado = computed(() => [
   { value: '', label: t('PORTELIA.PROPIEDADES.TODOS_ESTADOS') },
   ...opcionesDe(ESTADOS, t, 'ESTADO'),
 ]);
+
 const opcionesOperacion = computed(() => [
   { value: '', label: t('PORTELIA.PROPIEDADES.TODAS_OPERACIONES') },
   ...opcionesDe(OPERACIONES, t, 'OPERACION'),
@@ -38,6 +47,7 @@ const opcionesOperacion = computed(() => [
 
 const cargar = async () => {
   cargando.value = true;
+
   try {
     propiedades.value = (await miApi.get('propiedades')).data;
   } catch {
@@ -61,6 +71,7 @@ const textoDe = propiedad =>
 
 const filtradas = computed(() => {
   const termino = busqueda.value.trim().toLowerCase();
+
   return propiedades.value.filter(
     propiedad =>
       (!estado.value || propiedad.estado === estado.value) &&
@@ -87,6 +98,7 @@ const alImportar = propiedad =>
 onMounted(() => {
   cargar();
   const compartida = urlCompartida(route.query);
+
   if (compartida) importarRef.value.abrir(compartida);
 });
 </script>

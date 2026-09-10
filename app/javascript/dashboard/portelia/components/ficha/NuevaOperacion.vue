@@ -18,19 +18,26 @@ const emit = defineEmits(['creada']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const propiedadId = ref('');
+
 const tipo = ref('');
+
 const precio = ref('');
+
 const moneda = ref('USD');
+
 const guardando = ref(false);
 
 const opcionesPropiedad = computed(() =>
   props.propiedades.map(p => ({ value: p.id, label: nombrePropiedad(p) }))
 );
+
 const opcionesTipo = ['venta', 'alquiler'].map(value => ({
   value,
   label: value,
 }));
+
 const opcionesMoneda = ['USD', 'ARS'].map(value => ({ value, label: value }));
 
 const incompleto = computed(() => !propiedadId.value || !tipo.value);
@@ -38,12 +45,17 @@ const incompleto = computed(() => !propiedadId.value || !tipo.value);
 // La Propiedad elegida trae operación y precio: se proponen y el asesor corrige el cierre.
 const alElegirPropiedad = () => {
   const propiedad = props.propiedades.find(p => p.id === propiedadId.value);
+
   if (!propiedad) return;
+
   if (['venta', 'alquiler'].includes(propiedad.operacion))
     tipo.value = propiedad.operacion;
+
   if (propiedad.precio) precio.value = propiedad.precio;
+
   if (propiedad.moneda) moneda.value = propiedad.moneda;
 };
+
 watch(propiedadId, alElegirPropiedad);
 
 const abrir = (propiedadInicial = '') => {
@@ -51,21 +63,23 @@ const abrir = (propiedadInicial = '') => {
   precio.value = '';
   moneda.value = 'USD';
   propiedadId.value = propiedadInicial;
+
   if (propiedadInicial) alElegirPropiedad();
   dialogRef.value?.open();
 };
 
 const guardar = async () => {
   guardando.value = true;
+
   try {
     const { data } = await miApi.post('operaciones', {
       contactId: props.contactId,
       propiedadId: propiedadId.value,
       tipo: tipo.value,
-      ...(precio.value
-        ? { precio: Number(precio.value), moneda: moneda.value }
-        : {}),
+      precio: precio.value ? Number(precio.value) : undefined,
+      moneda: precio.value ? moneda.value : undefined,
     });
+
     emit('creada', data);
     dialogRef.value?.close();
   } catch (error) {

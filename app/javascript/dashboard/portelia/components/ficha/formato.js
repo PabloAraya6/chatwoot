@@ -13,6 +13,7 @@ export const nombrePropiedad = propiedad => {
   if (!propiedad) return '';
   const lugar = propiedad.direccion || propiedad.zona || propiedad.tipo;
   const valor = precio(propiedad.precio, propiedad.moneda);
+
   return valor ? `${lugar} · ${valor}` : lugar;
 };
 

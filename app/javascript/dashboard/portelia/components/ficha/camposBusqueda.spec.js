@@ -10,6 +10,7 @@ describe('camposBusqueda', () => {
       definicion('operacion'),
       'Operación'
     );
+
     expect(atributo).toEqual({
       attributeKey: 'operacion',
       attributeDisplayName: 'Operación',

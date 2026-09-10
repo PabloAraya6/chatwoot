@@ -23,6 +23,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
 const route = useRoute();
 
 // En el hilo la Visita queda atada a la conversación; en la página Personas no hay ninguna.
@@ -31,14 +32,23 @@ const conversationId = computed(
 );
 
 const cargando = ref(true);
+
 const fallo = ref(false);
+
 const busquedas = ref([]);
+
 const visitas = ref([]);
+
 const reacciones = ref([]);
+
 const operaciones = ref([]);
+
 const propiedades = ref([]);
+
 const nuevaReaccionRef = ref(null);
+
 const nuevaOperacionRef = ref(null);
+
 const nuevaVisitaRef = ref(null);
 
 const ESTADO_VISITA_COLOR = {
@@ -48,11 +58,13 @@ const ESTADO_VISITA_COLOR = {
   cancelada: 'ruby',
   no_se_presento: 'ruby',
 };
+
 const VEREDICTO_COLOR = {
   le_gusto: 'teal',
   no_le_gusto: 'ruby',
   lo_piensa: 'amber',
 };
+
 const ESTADO_OPERACION_COLOR = {
   reservada: 'amber',
   cerrada: 'teal',
@@ -60,6 +72,7 @@ const ESTADO_OPERACION_COLOR = {
 };
 
 const porId = computed(() => new Map(propiedades.value.map(p => [p.id, p])));
+
 const propiedadDe = id => nombrePropiedad(porId.value.get(id));
 
 const vigentes = computed(() => busquedas.value.filter(b => b.vigente));
@@ -67,11 +80,13 @@ const vigentes = computed(() => busquedas.value.filter(b => b.vigente));
 const cargar = async () => {
   cargando.value = true;
   fallo.value = false;
+
   try {
     const [persona, lista] = await Promise.all([
       miApi.get(`personas/${props.contactId}`),
       miApi.get('propiedades'),
     ]);
+
     busquedas.value = persona.data.busquedas;
     visitas.value = persona.data.visitas;
     reacciones.value = persona.data.reacciones;
@@ -89,6 +104,7 @@ const editarCampo = async (busqueda, campo, valor) => {
     const { data } = await miApi.patch(`busquedas/${busqueda.id}`, {
       [campo]: valor,
     });
+
     busquedas.value = busquedas.value.map(b => (b.id === data.id ? data : b));
     useAlert(t('PORTELIA.FICHA.GUARDADO'));
   } catch (error) {
@@ -119,6 +135,7 @@ const alCrearOperacion = () => {
 };
 
 onMounted(cargar);
+
 watch(() => props.contactId, cargar);
 </script>
 

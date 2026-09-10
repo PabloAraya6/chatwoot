@@ -17,17 +17,23 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
 const route = useRoute();
+
 const router = useRouter();
+
 const { accountScopedRoute } = useAccount();
 
 const propiedad = ref(null);
+
 const cargando = ref(true);
+
 const enviarRef = ref(null);
 
 const titulo = computed(() =>
   propiedad.value ? tituloDe(propiedad.value, t) : ''
 );
+
 const migas = computed(() => [
   { label: t('PORTELIA.PROPIEDADES.TITULO') },
   { label: titulo.value },
@@ -35,12 +41,15 @@ const migas = computed(() => [
 
 const si = valor =>
   t(valor ? 'PORTELIA.PROPIEDADES.FICHA.SI' : 'PORTELIA.PROPIEDADES.FICHA.NO');
+
 const m2 = valor => `${valor.toLocaleString('es-AR')} m²`;
 
 // Una fila por dato conocido: lo que la Propiedad no sabe no ocupa lugar en la ficha.
 const datos = computed(() => {
   const p = propiedad.value;
+
   if (!p) return [];
+
   return [
     ['PRECIO', precioDe(p, t)],
     [
@@ -66,6 +75,7 @@ const datos = computed(() => {
 
 const cargar = async () => {
   cargando.value = true;
+
   try {
     propiedad.value = (
       await miApi.get(`propiedades/${props.propiedadId}`)
@@ -79,6 +89,7 @@ const cargar = async () => {
 };
 
 const volver = () => router.push(accountScopedRoute('portelia_propiedades'));
+
 const editar = () =>
   router.push(
     accountScopedRoute('portelia_propiedad_editar', {

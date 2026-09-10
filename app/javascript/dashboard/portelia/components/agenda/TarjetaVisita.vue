@@ -19,6 +19,7 @@ const props = defineProps({
 const emit = defineEmits(['mover']);
 
 const { t } = useI18n();
+
 const { accountScopedRoute } = useAccount();
 
 const ACCIONES = [

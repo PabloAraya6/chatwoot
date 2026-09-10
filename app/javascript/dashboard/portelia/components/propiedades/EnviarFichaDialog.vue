@@ -15,9 +15,13 @@ const props = defineProps({
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const conversaciones = ref([]);
+
 const conversacionId = ref('');
+
 const cargando = ref(false);
+
 const enviando = ref(false);
 
 const opciones = computed(() =>
@@ -38,12 +42,14 @@ const opciones = computed(() =>
 // Las conversaciones abiertas del asesor: la ficha sólo se manda a quien ya está hablando.
 const cargar = async () => {
   cargando.value = true;
+
   try {
     const { data } = await ConversationApi.get({
       status: 'open',
       assigneeType: 'me',
       page: 1,
     });
+
     conversaciones.value = data.data.payload;
   } catch {
     conversaciones.value = [];
@@ -55,6 +61,7 @@ const cargar = async () => {
 const enviar = async () => {
   if (!conversacionId.value || enviando.value) return;
   enviando.value = true;
+
   try {
     const { data } = await miApi.post(
       `propiedades/${props.propiedadId}/enviar`,
@@ -62,6 +69,7 @@ const enviar = async () => {
         conversationId: Number(conversacionId.value),
       }
     );
+
     useAlert(
       t(
         data.conFoto

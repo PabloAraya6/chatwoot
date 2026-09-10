@@ -10,18 +10,23 @@ const emit = defineEmits(['importada']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const url = ref('');
+
 const error = ref('');
+
 const importando = ref(false);
 
 const importar = async () => {
   if (!url.value.trim() || importando.value) return;
   importando.value = true;
   error.value = '';
+
   try {
     const { data } = await miApi.post('propiedades/importar', {
       url: url.value.trim(),
     });
+
     dialogRef.value.close();
     emit('importada', data);
   } catch (e) {
@@ -37,6 +42,7 @@ const abrir = (urlInicial = '') => {
   url.value = urlInicial;
   error.value = '';
   dialogRef.value.open();
+
   if (urlInicial) importar();
 };
 

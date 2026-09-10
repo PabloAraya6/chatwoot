@@ -19,9 +19,13 @@ const emit = defineEmits(['creada']);
 const { t } = useI18n();
 
 const dialogRef = ref(null);
+
 const propiedadId = ref('');
+
 const veredicto = ref('');
+
 const motivo = ref('');
+
 const guardando = ref(false);
 
 const VEREDICTOS = ['le_gusto', 'no_le_gusto', 'lo_piensa'];
@@ -29,6 +33,7 @@ const VEREDICTOS = ['le_gusto', 'no_le_gusto', 'lo_piensa'];
 const opcionesPropiedad = computed(() =>
   props.propiedades.map(p => ({ value: p.id, label: nombrePropiedad(p) }))
 );
+
 const opcionesVeredicto = VEREDICTOS.map(value => ({
   value,
   label: t(`PORTELIA.FICHA.VEREDICTO.${value}`),
@@ -53,14 +58,16 @@ const abrir = (propiedadInicial = '') => {
 
 const guardar = async () => {
   guardando.value = true;
+
   try {
     const { data } = await miApi.post('reacciones', {
       contactId: props.contactId,
       propiedadId: propiedadId.value,
       veredicto: veredicto.value,
-      ...(motivo.value.trim() ? { motivo: motivo.value.trim() } : {}),
-      ...(visitaRealizada() ? { visitaId: visitaRealizada().id } : {}),
+      motivo: motivo.value.trim() || undefined,
+      visitaId: visitaRealizada()?.id,
     });
+
     emit('creada', data);
     dialogRef.value?.close();
   } catch (error) {

@@ -16,13 +16,16 @@ const props = defineProps({
 });
 
 const store = useStore();
+
 const { t } = useI18n();
+
 const currentUserId = useMapGetter('getCurrentUserID');
 
 const asignado = computed(() => props.chat.meta?.assignee);
 
 const estado = computed(() => {
   if (!asignado.value) return 'guardia';
+
   return asignado.value.id === currentUserId.value ? 'mio' : 'otro';
 });
 
@@ -43,6 +46,7 @@ const tomar = () =>
 // El estado lo deriva la API del mismo hilo que lee la secretaria; se relee cuando cambia
 // la conversación o llega un mensaje, que es lo único que lo mueve.
 const secretaria = ref(null);
+
 const devolviendo = ref(false);
 
 const leerSecretaria = async () => {
@@ -66,6 +70,7 @@ const calla = computed(
 const devolver = async () => {
   if (devolviendo.value) return;
   devolviendo.value = true;
+
   try {
     await miApi.post(`conversaciones/${props.chat.id}/secretaria`);
     useAlert(t('PORTELIA.HILO.DEVUELTA'));
