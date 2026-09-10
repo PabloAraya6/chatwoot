@@ -17,6 +17,9 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` | Con el flag prendido renderiza `SidebarAsesor` en lugar de `menuItems` (import, computed `hasPorteliaUi`, `v-if`/`v-else` en el `<nav>`). |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer`. |
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
+| `app/javascript/dashboard/composables/useUISettings.js` | Suma `portelia_ficha` a `DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER`, arriba de todo. |
+| `app/javascript/dashboard/routes/dashboard/conversation/ContactPanel.vue` | Con el flag, `FichaPersona` como sección `portelia_ficha` del acordeón del panel (import, `hasPorteliaUi`, un `v-if` en el `#item`). |
+| `app/javascript/dashboard/routes/dashboard/contacts/pages/ContactManageView.vue` | Con el flag, `FichaPersona` arriba de los datos del contacto en la página Personas (import, `hasPorteliaUi`, un `v-if`). |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
 `docker-compose.portelia.yaml`, `Caddyfile.taller`.

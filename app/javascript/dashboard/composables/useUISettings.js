@@ -2,6 +2,7 @@ import { computed } from 'vue';
 import { useStore, useStoreGetters } from 'dashboard/composables/store';
 
 export const DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER = Object.freeze([
+  { name: 'portelia_ficha' },
   { name: 'conversation_actions' },
   { name: 'macros' },
   { name: 'conversation_info' },
@@ -46,7 +47,9 @@ const useConversationSidebarItemsOrder = uiSettings => {
     // If the sidebar order doesn't have the new elements, then add them to the list.
     DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER.forEach(item => {
       if (!itemsOrderCopy.find(i => i.name === item.name)) {
-        itemsOrderCopy.push(item);
+        // portelia: la ficha de la Persona arranca arriba aunque el usuario ya tenga un orden guardado
+        if (item.name === 'portelia_ficha') itemsOrderCopy.unshift(item);
+        else itemsOrderCopy.push(item);
       }
     });
     return itemsOrderCopy;
