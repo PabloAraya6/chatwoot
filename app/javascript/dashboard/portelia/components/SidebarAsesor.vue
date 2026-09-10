@@ -27,6 +27,11 @@ const entradas = computed(() => [
     label: t('PORTELIA.SIDEBAR.PROPIEDADES'),
     icon: 'i-lucide-house',
     to: accountScopedRoute('portelia_propiedades'),
+    activeOn: [
+      'portelia_propiedad',
+      'portelia_propiedad_nueva',
+      'portelia_propiedad_editar',
+    ],
   },
   {
     name: 'Agenda',
