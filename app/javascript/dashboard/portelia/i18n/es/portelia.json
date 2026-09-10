@@ -25,9 +25,6 @@
       "AVISO": "Activá los avisos para recibir el traspaso en el celular con la Bandeja cerrada.",
       "ACTIVAR": "Activar"
     },
-    "PENDIENTE": {
-      "DETALLE": "Esta pantalla llega en un ticket próximo del mapa."
-    },
     "PROPIEDADES": {
       "TITULO": "Propiedades",
       "BUSCAR": "Buscar por dirección, zona o código",
@@ -249,6 +246,69 @@
       "GUARDADO": "Configuración guardada.",
       "ERROR": "No se pudo guardar.",
       "ERROR_CARGA": "No se pudo cargar la configuración."
+    },
+    "AGENDA": {
+      "TITULO": "Agenda",
+      "HOY": "Hoy",
+      "HOY_VACIO_TITULO": "Sin visitas hoy",
+      "HOY_VACIO_DETALLE": "Las que agende la secretaria aparecen acá para que las confirmes.",
+      "SEMANA": "Esta semana",
+      "SEMANA_VACIA": "Sin más visitas en los próximos siete días.",
+      "PERSONA_SIN_NOMBRE": "Sin nombre",
+      "ERROR_CARGA": "No se pudo cargar la agenda.",
+      "ERROR_GUARDAR": "No se pudo guardar. Probá de nuevo.",
+      "ACCION": {
+        "confirmada": "Confirmar",
+        "realizada": "Realizada",
+        "no_se_presento": "No vino",
+        "cancelada": "Cancelar"
+      },
+      "DIA": {
+        "0": "Domingo",
+        "1": "Lunes",
+        "2": "Martes",
+        "3": "Miércoles",
+        "4": "Jueves",
+        "5": "Viernes",
+        "6": "Sábado"
+      },
+      "NUEVA": {
+        "BOTON": "Nueva visita",
+        "AGENDAR": "Agendar",
+        "TITULO": "Agendar una visita",
+        "DESCRIPCION": "Queda confirmada y la secretaria la tiene en cuenta en la conversación.",
+        "PERSONA": "Persona",
+        "ELEGIR_PERSONA": "Elegí una conversación abierta",
+        "SIN_CONVERSACIONES": "No tenés conversaciones abiertas asignadas.",
+        "DIA": "Día",
+        "HORARIO": "Horario",
+        "ELEGIR_HORARIO": "Elegí un horario libre",
+        "SIN_HUECOS": "No hay huecos libres ese día. Revisá tus franjas de disponibilidad.",
+        "CONFIRMAR": "Agendar",
+        "CREADA": "Visita agendada."
+      },
+      "CANCELAR": {
+        "TITULO": "Cancelar la visita",
+        "DESCRIPCION": "El motivo queda en la ficha de la persona.",
+        "MOTIVO": "Motivo",
+        "MOTIVO_EJEMPLO": "El cliente no puede ese día",
+        "CONFIRMAR": "Cancelar la visita"
+      },
+      "CIERRE": {
+        "TITULO": "¿Hubo cierre?",
+        "DESCRIPCION": "Si se reservó o se cerró, la Operación cambia el estado de la propiedad y cierra la Búsqueda.",
+        "CONFIRMAR": "Crear la operación",
+        "NO": "Todavía no"
+      },
+      "FRANJAS": {
+        "BOTON": "Disponibilidad",
+        "TITULO": "Tu disponibilidad",
+        "DESCRIPCION": "Las franjas de cada día en las que hacés visitas. La secretaria sólo ofrece horarios dentro de ellas.",
+        "AGREGAR": "Franja",
+        "SIN_FRANJA": "Sin visitas este día.",
+        "HASTA": "a",
+        "GUARDADAS": "Disponibilidad guardada."
+      }
     }
   }
 }

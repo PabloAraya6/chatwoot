@@ -1,22 +1,14 @@
 import { frontendURL } from 'dashboard/helper/URLHelper';
 import { FEATURE_FLAGS } from 'dashboard/featureFlags';
 import { ROLES } from 'dashboard/constants/permissions';
-import PantallaPendiente from '../components/PantallaPendiente.vue';
 import ListaPropiedades from '../components/propiedades/ListaPropiedades.vue';
 import FichaPropiedad from '../components/propiedades/FichaPropiedad.vue';
 import FormularioPropiedad from '../components/propiedades/FormularioPropiedad.vue';
 import CompartirAviso from '../components/propiedades/CompartirAviso.vue';
 import Configuracion from '../components/configuracion/Configuracion.vue';
+import Agenda from '../components/agenda/Agenda.vue';
 
 const meta = { permissions: ROLES, featureFlag: FEATURE_FLAGS.PORTELIA_UI };
-
-const pendiente = pantalla => ({
-  path: frontendURL(`accounts/:accountId/${pantalla}`),
-  name: `portelia_${pantalla}`,
-  component: PantallaPendiente,
-  meta,
-  props: { pantalla },
-});
 
 export const routes = [
   {
@@ -45,7 +37,12 @@ export const routes = [
     meta,
     props: true,
   },
-  pendiente('agenda'),
+  {
+    path: frontendURL('accounts/:accountId/agenda'),
+    name: 'portelia_agenda',
+    component: Agenda,
+    meta,
+  },
   {
     // La configuración es de la Cuenta: sólo administradores, como los settings de upstream.
     path: frontendURL('accounts/:accountId/configuracion'),
