@@ -8,6 +8,7 @@ import Button from 'dashboard/components-next/button/Button.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
+import Switch from 'dashboard/components-next/switch/Switch.vue';
 import TextArea from 'dashboard/components-next/textarea/TextArea.vue';
 import miApi from '../../api/miApi';
 
@@ -27,6 +28,10 @@ const error = ref('');
 const cuenta = ref(null);
 
 const gasto = ref(null);
+
+// Aparte de `campos`, que son strings de inputs de texto: este es un booleano y pasarlo por
+// el String() de desdeCuenta lo dejaría siempre prendido.
+const muestraPropiedades = ref(false);
 
 const campos = reactive({
   modoSecretaria: 'off',
@@ -73,6 +78,7 @@ const desdeCuenta = datos => {
   Object.keys(campos).forEach(campo => {
     campos[campo] = String(datos[campo] ?? '');
   });
+  muestraPropiedades.value = datos.muestraPropiedades === true;
 };
 
 const aCuenta = () => ({
@@ -85,6 +91,7 @@ const aCuenta = () => ({
   comoRespondemos: campos.comoRespondemos.trim(),
   techoUsdPorConversacion: Number(campos.techoUsdPorConversacion),
   techoUsdPorMes: Number(campos.techoUsdPorMes),
+  muestraPropiedades: muestraPropiedades.value,
 });
 
 const cargar = async () => {
@@ -179,6 +186,17 @@ onMounted(cargar);
               :message="t('PORTELIA.CONFIGURACION.NOMBRE_ASESOR_AYUDA')"
               required
             />
+            <div class="flex items-start justify-between gap-4">
+              <span class="flex flex-col gap-1">
+                <span class="text-sm font-medium text-n-slate-12">
+                  {{ t('PORTELIA.CONFIGURACION.MUESTRA_PROPIEDADES.LABEL') }}
+                </span>
+                <span class="text-xs text-n-slate-11">
+                  {{ t('PORTELIA.CONFIGURACION.MUESTRA_PROPIEDADES.AYUDA') }}
+                </span>
+              </span>
+              <Switch v-model="muestraPropiedades" class="mt-1" />
+            </div>
             <TextArea
               v-model="campos.comoRespondemos"
               :label="t('PORTELIA.CONFIGURACION.COMO_RESPONDEMOS')"

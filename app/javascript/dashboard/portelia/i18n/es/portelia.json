@@ -245,7 +245,11 @@
       "GUARDAR": "Guardar",
       "GUARDADO": "Configuración guardada.",
       "ERROR": "No se pudo guardar.",
-      "ERROR_CARGA": "No se pudo cargar la configuración."
+      "ERROR_CARGA": "No se pudo cargar la configuración.",
+      "MUESTRA_PROPIEDADES": {
+        "LABEL": "La secretaria le muestra las propiedades al cliente",
+        "AYUDA": "Prendido, antes de pasarte la conversación le manda hasta dos propiedades del catálogo con su precio. Apagado, junta los datos y te la pasa sin mostrarle nada."
+      }
     },
     "AGENDA": {
       "TITULO": "Agenda",
