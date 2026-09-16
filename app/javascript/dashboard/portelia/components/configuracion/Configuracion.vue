@@ -136,7 +136,7 @@ onMounted(cargar);
 
 <template>
   <section
-    class="flex flex-col w-full h-full px-6 pt-4 pb-8 overflow-auto bg-n-surface-1"
+    class="flex flex-col w-full h-full px-4 sm:px-6 pt-4 pb-4 overflow-auto bg-n-surface-1 [&_button:not([role=switch])]:min-h-11 [&_button:not([role=switch])]:min-w-11 [&_input:not([type=checkbox])]:min-h-11 [&_select]:min-h-11 max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base max-sm:[&_select]:text-base motion-reduce:[&_*]:!transition-none"
   >
     <div class="flex flex-col w-full max-w-2xl mx-auto">
       <BaseSettingsHeader
@@ -199,7 +199,9 @@ onMounted(cargar);
               :message="t('PORTELIA.CONFIGURACION.NOMBRE_ASESOR_AYUDA')"
               required
             />
-            <div class="flex items-start justify-between gap-4">
+            <label
+              class="flex items-center justify-between min-h-11 gap-4 cursor-pointer"
+            >
               <span class="flex flex-col gap-1">
                 <span class="text-sm font-medium text-n-slate-12">
                   {{ t('PORTELIA.CONFIGURACION.MUESTRA_PROPIEDADES.LABEL') }}
@@ -208,8 +210,14 @@ onMounted(cargar);
                   {{ t('PORTELIA.CONFIGURACION.MUESTRA_PROPIEDADES.AYUDA') }}
                 </span>
               </span>
-              <Switch v-model="muestraPropiedades" class="mt-1" />
-            </div>
+              <Switch
+                v-model="muestraPropiedades"
+                :aria-label="
+                  t('PORTELIA.CONFIGURACION.MUESTRA_PROPIEDADES.LABEL')
+                "
+                class="shrink-0"
+              />
+            </label>
             <TextArea
               v-model="campos.comoRespondemos"
               :label="t('PORTELIA.CONFIGURACION.COMO_RESPONDEMOS')"
@@ -231,6 +239,7 @@ onMounted(cargar);
             <Input
               v-model="campos.techoUsdPorConversacion"
               type="number"
+              inputmode="decimal"
               min="0"
               step="0.01"
               :label="t('PORTELIA.CONFIGURACION.GASTO.POR_CONVERSACION')"
@@ -239,6 +248,7 @@ onMounted(cargar);
             <Input
               v-model="campos.techoUsdPorMes"
               type="number"
+              inputmode="decimal"
               min="0"
               step="1"
               :label="t('PORTELIA.CONFIGURACION.GASTO.POR_MES')"
@@ -249,7 +259,7 @@ onMounted(cargar);
 
         <p v-if="error" class="mb-4 text-sm text-n-ruby-11">{{ error }}</p>
 
-        <div>
+        <div class="sticky bottom-0 py-3 bg-n-surface-1 border-t border-n-weak">
           <Button
             type="submit"
             :label="t('PORTELIA.CONFIGURACION.GUARDAR')"

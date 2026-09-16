@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import TextArea from 'dashboard/components-next/textarea/TextArea.vue';
 
 // Cancelar pide el motivo: sin él, ni el asesor ni la secretaria saben después por qué.
+const props = defineProps({ guardando: { type: Boolean, default: false } });
+
 const emit = defineEmits(['cancelar']);
 
 const { t } = useI18n();
@@ -13,20 +15,17 @@ const dialogRef = ref(null);
 
 const motivo = ref('');
 
-const guardando = ref(false);
-
 const vacio = computed(() => !motivo.value.trim());
 
 const abrir = () => {
   motivo.value = '';
-  guardando.value = false;
   dialogRef.value?.open();
 };
 
 const cerrar = () => dialogRef.value?.close();
 
 const confirmar = () => {
-  guardando.value = true;
+  if (props.guardando || vacio.value) return;
   emit('cancelar', motivo.value.trim());
 };
 
@@ -34,7 +33,7 @@ defineExpose({ abrir, cerrar });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     type="alert"
     :title="t('PORTELIA.AGENDA.CANCELAR.TITULO')"
@@ -50,5 +49,5 @@ defineExpose({ abrir, cerrar });
       :placeholder="t('PORTELIA.AGENDA.CANCELAR.MOTIVO_EJEMPLO')"
       autofocus
     />
-  </Dialog>
+  </DialogoAsesor>
 </template>

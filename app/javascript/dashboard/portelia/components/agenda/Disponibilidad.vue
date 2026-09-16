@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import { useAlert } from 'dashboard/composables';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import miApi from '../../api/miApi';
 import { DIAS_SEMANA } from './visita';
@@ -19,9 +21,13 @@ const dialogRef = ref(null);
 
 const franjas = ref([]);
 
-const cargando = ref(false);
+const { run, abort, isPending: cargando } = useAbortableRequest();
 
 const guardando = ref(false);
+
+const cargada = ref(false);
+
+const fallo = ref(false);
 
 const porDia = computed(() =>
   DIAS_SEMANA.map(diaSemana => ({
@@ -42,22 +48,34 @@ const quitar = franja => {
   franjas.value = franjas.value.filter(otra => otra !== franja);
 };
 
-const abrir = async () => {
-  dialogRef.value?.open();
-  cargando.value = true;
+const cargar = async () => {
+  cargada.value = false;
+  fallo.value = false;
 
   try {
-    franjas.value = (await miApi.get('disponibilidad')).data.map(
-      ({ diaSemana, desde, hasta }) => ({ diaSemana, desde, hasta })
+    const respuesta = await run(signal =>
+      miApi.get('disponibilidad', { signal })
     );
+    if (!respuesta) return;
+    franjas.value = respuesta.data.map(({ diaSemana, desde, hasta }) => ({
+      diaSemana,
+      desde,
+      hasta,
+    }));
+    cargada.value = true;
   } catch {
-    useAlert(t('PORTELIA.AGENDA.ERROR_CARGA'));
-  } finally {
-    cargando.value = false;
+    fallo.value = true;
   }
 };
 
+const abrir = () => {
+  dialogRef.value?.open();
+  return cargar();
+};
+
 const guardar = async () => {
+  if (guardando.value || cargando.value || !cargada.value || hayInvalidas.value)
+    return;
   guardando.value = true;
 
   try {
@@ -81,19 +99,29 @@ defineExpose({ abrir });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.AGENDA.FRANJAS.TITULO')"
     :description="t('PORTELIA.AGENDA.FRANJAS.DESCRIPCION')"
     :confirm-button-label="t('PORTELIA.FICHA.GUARDAR')"
-    :disable-confirm-button="hayInvalidas"
+    :disable-confirm-button="!cargada || cargando || hayInvalidas"
     :is-loading="guardando"
     overflow-y-auto
     @confirm="guardar"
+    @close="abort"
   >
     <div v-if="cargando" class="flex justify-center py-4">
       <Spinner />
     </div>
+    <Banner
+      v-else-if="fallo"
+      color="ruby"
+      role="alert"
+      :action-label="t('PORTELIA.REINTENTAR')"
+      @action="cargar"
+    >
+      {{ t('PORTELIA.AGENDA.ERROR_CARGA') }}
+    </Banner>
     <div v-else class="flex flex-col gap-3">
       <div
         v-for="dia in porDia"
@@ -105,6 +133,7 @@ defineExpose({ abrir });
             {{ t(`PORTELIA.AGENDA.DIA.${dia.diaSemana}`) }}
           </span>
           <Button
+            type="button"
             variant="faded"
             color="slate"
             size="xs"
@@ -121,20 +150,40 @@ defineExpose({ abrir });
           :key="indice"
           class="flex items-center gap-2"
         >
-          <Input v-model="franja.desde" type="time" size="sm" class="flex-1" />
+          <Input
+            v-model="franja.desde"
+            type="time"
+            class="flex-1"
+            :aria-label="
+              t('PORTELIA.AGENDA.FRANJAS.DESDE_DIA', {
+                dia: t(`PORTELIA.AGENDA.DIA.${dia.diaSemana}`),
+              })
+            "
+          />
           <span class="text-sm text-n-slate-11">
             {{ t('PORTELIA.AGENDA.FRANJAS.HASTA') }}
           </span>
-          <Input v-model="franja.hasta" type="time" size="sm" class="flex-1" />
+          <Input
+            v-model="franja.hasta"
+            type="time"
+            class="flex-1"
+            :aria-label="
+              t('PORTELIA.AGENDA.FRANJAS.HASTA_DIA', {
+                dia: t(`PORTELIA.AGENDA.DIA.${dia.diaSemana}`),
+              })
+            "
+          />
           <Button
+            type="button"
             variant="ghost"
             color="slate"
             size="xs"
             icon="i-lucide-trash-2"
+            :aria-label="t('PORTELIA.AGENDA.FRANJAS.QUITAR')"
             @click="quitar(franja)"
           />
         </div>
       </div>
     </div>
-  </Dialog>
+  </DialogoAsesor>
 </template>

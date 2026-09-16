@@ -139,3 +139,26 @@ describe('FormularioPropiedad', () => {
     expect(direccion.props('modelValue')).toBe('');
   });
 });
+
+it('uses integer keyboards for room counts and decimal keyboards for amounts', () => {
+  const wrapper = shallowMount(FormularioPropiedad);
+  const inputs = wrapper.findAllComponents(Input);
+  ['AMBIENTES', 'DORMITORIOS', 'BANOS'].forEach(campo => {
+    expect(
+      inputs
+        .find(
+          input =>
+            input.props('label') === `PORTELIA.PROPIEDADES.FORMULARIO.${campo}`
+        )
+        .attributes('inputmode')
+    ).toBe('numeric');
+  });
+  expect(
+    inputs
+      .find(
+        input =>
+          input.props('label') === 'PORTELIA.PROPIEDADES.FORMULARIO.PRECIO'
+      )
+      .attributes('inputmode')
+  ).toBe('decimal');
+});

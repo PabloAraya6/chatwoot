@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import miApi from '../../api/miApi';
 
@@ -50,7 +50,7 @@ defineExpose({ abrir });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.PROPIEDADES.IMPORTAR.TITULO')"
     :description="t('PORTELIA.PROPIEDADES.IMPORTAR.DESCRIPCION')"
@@ -59,10 +59,12 @@ defineExpose({ abrir });
     :disable-confirm-button="!url.trim()"
     @confirm="importar"
   >
-    <form class="flex flex-col gap-2" @submit.prevent="importar">
+    <div class="flex flex-col gap-2">
       <Input
         v-model="url"
         type="url"
+        inputmode="url"
+        autocomplete="url"
         autofocus
         :label="t('PORTELIA.PROPIEDADES.IMPORTAR.URL')"
         :placeholder="t('PORTELIA.PROPIEDADES.IMPORTAR.PLACEHOLDER')"
@@ -73,6 +75,6 @@ defineExpose({ abrir });
       <p v-if="importando" class="mb-0 text-sm text-n-slate-11">
         {{ t('PORTELIA.PROPIEDADES.IMPORTAR.LEYENDO') }}
       </p>
-    </form>
-  </Dialog>
+    </div>
+  </DialogoAsesor>
 </template>

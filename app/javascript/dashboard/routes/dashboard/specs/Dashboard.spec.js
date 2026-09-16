@@ -22,6 +22,10 @@ vi.mock('dashboard/stores/calls', () => ({
   useCallsStore: () => ({ hasActiveCall: false, hasIncomingCall: false }),
 }));
 
+vi.mock('dashboard/portelia/composables/usePorteliaUi', () => ({
+  usePorteliaUi: () => ref(false),
+}));
+
 const RoutedContent = { template: '<div class="routed-content" />' };
 
 const ROUTES = [

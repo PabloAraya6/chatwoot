@@ -27,6 +27,8 @@ import CopilotContainer from 'dashboard/components/copilot/CopilotContainer.vue'
 import MobileSidebarLauncher from 'dashboard/components-next/sidebar/MobileSidebarLauncher.vue';
 import BarraInferiorAsesor from 'dashboard/portelia/components/BarraInferiorAsesor.vue';
 import { useBarraInferior } from 'dashboard/portelia/composables/useBarraInferior';
+import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
+import { CLASES_ASESOR } from 'dashboard/portelia/clasesAsesor';
 import { useCallsStore } from 'dashboard/stores/calls';
 
 export default {
@@ -56,6 +58,8 @@ export default {
       upgradePageRef,
       windowWidth,
       hasBarraInferior: useBarraInferior(),
+      hasPorteliaUi: usePorteliaUi(),
+      clasesAsesor: CLASES_ASESOR,
       hasActiveCall: computed(() => callsStore.hasActiveCall),
       hasIncomingCall: computed(() => callsStore.hasIncomingCall),
     };
@@ -145,10 +149,15 @@ export default {
 
     <main
       class="flex flex-1 h-full w-full min-h-0 px-0 overflow-hidden bg-n-surface-1"
-      :class="{
-        'max-md:pb-[calc(3.5rem+env(safe-area-inset-bottom))]':
-          hasBarraInferior,
-      }"
+      :class="[
+        hasPorteliaUi && clasesAsesor,
+        {
+          'max-md:pb-[env(safe-area-inset-bottom)]':
+            hasPorteliaUi && !hasBarraInferior,
+          'max-md:pb-[calc(3.5rem+env(safe-area-inset-bottom))]':
+            hasBarraInferior,
+        },
+      ]"
     >
       <UpgradePage
         v-show="showUpgradePage"

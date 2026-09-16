@@ -1,5 +1,5 @@
 import { flushPromises, shallowMount } from '@vue/test-utils';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import Dialog from '../DialogoAsesor.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import miApi from '../../api/miApi';
@@ -22,7 +22,7 @@ describe.each([
   it('rejects incomplete submissions and sends only once while saving', async () => {
     const wrapper = shallowMount(component, {
       props: { contactId: 12, propiedades: [{ id: 'p' }], visitas: [] },
-      global: { stubs: { Dialog: DialogStub } },
+      global: { stubs: { DialogoAsesor: DialogStub } },
     });
     const dialog = wrapper.getComponent(Dialog);
     dialog.vm.$emit('confirm');
@@ -62,7 +62,7 @@ it('clears operation terms when changing to a property without those values', as
         { id: 'b', operacion: 'temporario' },
       ],
     },
-    global: { stubs: { Dialog: DialogStub } },
+    global: { stubs: { DialogoAsesor: DialogStub } },
   });
   const selects = wrapper.findAllComponents(Select);
   selects[0].vm.$emit('update:modelValue', 'a');

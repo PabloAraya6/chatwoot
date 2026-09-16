@@ -3,9 +3,9 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAlert } from 'dashboard/composables';
 import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
-import ConversationApi from 'dashboard/api/inbox/conversation';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import { conversacionesPropias } from '../../api/conversaciones';
 import Banner from 'dashboard/components-next/banner/Banner.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import miApi from '../../api/miApi';
@@ -49,29 +49,7 @@ const cargar = async () => {
   fallo.value = false;
 
   try {
-    const respuesta = await run(async signal => {
-      const lista = [];
-      let page = 1;
-      let total;
-
-      do {
-        // Each page's metadata determines whether another request is needed.
-        // eslint-disable-next-line no-await-in-loop
-        const { data } = await ConversationApi.get({
-          status: 'open',
-          assigneeType: 'me',
-          page,
-        });
-        if (signal.aborted) return undefined;
-        const { payload, meta } = data.data;
-        lista.push(...payload);
-        total = meta.mine_count;
-        if (!payload.length) break;
-        page += 1;
-      } while (lista.length < total);
-
-      return lista;
-    });
+    const respuesta = await run(conversacionesPropias);
 
     if (respuesta) conversaciones.value = respuesta;
   } catch {
@@ -123,7 +101,7 @@ defineExpose({ abrir });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.PROPIEDADES.ENVIAR.TITULO')"
     :description="t('PORTELIA.PROPIEDADES.ENVIAR.DESCRIPCION')"
@@ -158,5 +136,5 @@ defineExpose({ abrir });
         class="!w-full [&>select]:w-full"
       />
     </label>
-  </Dialog>
+  </DialogoAsesor>
 </template>

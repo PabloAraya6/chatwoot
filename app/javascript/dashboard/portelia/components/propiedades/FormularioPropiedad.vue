@@ -215,14 +215,16 @@ watch(() => props.propiedadId, cargar, { immediate: true });
 </script>
 
 <template>
-  <section class="flex w-full h-full overflow-hidden bg-n-surface-1">
-    <div class="flex flex-col w-full h-full">
-      <header class="sticky top-0 z-10 px-6">
+  <section
+    class="flex w-full min-w-0 h-full overflow-hidden bg-n-surface-1 [&_button:not([role=switch])]:min-h-11 [&_button:not([role=switch])]:min-w-11 [&_input:not([type=checkbox])]:min-h-11 [&_select]:min-h-11 max-sm:[&_input]:text-base max-sm:[&_select]:text-base motion-reduce:[&_*]:!transition-none"
+  >
+    <div class="flex flex-col w-full min-w-0 h-full">
+      <header class="sticky top-0 z-10 px-4 sm:px-6">
         <div class="w-full py-6 mx-auto max-w-[40.625rem]">
           <Breadcrumb :items="migas" @click="cancelar" />
         </div>
       </header>
-      <main class="flex-1 px-6 pb-6 overflow-y-auto">
+      <main class="flex-1 min-h-0 px-4 sm:px-6 overflow-y-auto">
         <div v-if="cargando" class="flex justify-center py-20">
           <Spinner />
         </div>
@@ -293,6 +295,7 @@ watch(() => props.propiedadId, cargar, { immediate: true });
             <Input
               v-model="campos.precio"
               type="number"
+              inputmode="decimal"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.PRECIO')"
             />
@@ -309,41 +312,47 @@ watch(() => props.propiedadId, cargar, { immediate: true });
             <Input
               v-model="campos.expensas"
               type="number"
+              inputmode="decimal"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.EXPENSAS')"
             />
             <Input
               v-model="campos.superficieCubiertaM2"
               type="number"
+              inputmode="decimal"
               min="1"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.SUPERFICIE_CUBIERTA')"
             />
             <Input
               v-model="campos.superficieTotalM2"
               type="number"
+              inputmode="decimal"
               min="1"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.SUPERFICIE_TOTAL')"
             />
             <Input
               v-model="campos.ambientes"
               type="number"
+              inputmode="numeric"
               min="1"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.AMBIENTES')"
             />
             <Input
               v-model="campos.dormitorios"
               type="number"
+              inputmode="numeric"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.DORMITORIOS')"
             />
             <Input
               v-model="campos.banos"
               type="number"
+              inputmode="numeric"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.BANOS')"
             />
             <label
-              class="flex items-center self-end gap-2 h-10 text-sm text-n-slate-12"
+              class="flex items-center self-end gap-2 min-h-11 text-sm text-n-slate-12"
             >
               <Checkbox v-model="campos.cochera" />
               {{ t('PORTELIA.PROPIEDADES.FORMULARIO.COCHERA') }}
@@ -381,18 +390,22 @@ watch(() => props.propiedadId, cargar, { immediate: true });
             <Input
               v-model="campos.urlRecorrido"
               type="url"
+              inputmode="url"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.RECORRIDO')"
             />
             <Input
               v-model="campos.urlAviso"
               type="url"
+              inputmode="url"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.AVISO')"
             />
           </fieldset>
 
           <p v-if="error" class="mb-0 text-sm text-n-ruby-11">{{ error }}</p>
 
-          <div class="flex items-center justify-end gap-2">
+          <div
+            class="sticky bottom-0 flex items-center justify-end gap-2 py-3 bg-n-surface-1 border-t border-n-weak"
+          >
             <Button
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.CANCELAR')"
               variant="link"

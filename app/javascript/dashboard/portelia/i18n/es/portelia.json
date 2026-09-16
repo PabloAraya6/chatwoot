@@ -188,7 +188,7 @@
       },
       "REACCIONES": {
         "TITULO": "Reacciones",
-        "VACIAS": "Sin reacciones. Después de una visita, anotá qué le pareció.",
+        "VACIAS": "Sin reacciones. Anotá qué le pareció la Propiedad.",
         "NUEVA": "Nueva reacción",
         "VEREDICTO": "Qué le pareció",
         "MOTIVO": "Por qué",
@@ -212,6 +212,20 @@
           "cerrada": "cerrada",
           "caida": "caída"
         }
+      },
+      "SIN_DATO": "Sin dato",
+      "SI": "Sí",
+      "NO": "No",
+      "EDITAR_CAMPO": "Corregir {campo}: {valor}",
+      "CANCELAR": "Cancelar",
+      "HISTORIAL": {
+        "TITULO": "Historial de la Búsqueda",
+        "DESCRIPCION": "Valores anteriores y actuales, con su origen. Las correcciones quedan registradas al guardar.",
+        "ANTES": "Antes",
+        "DESPUES": "Después",
+        "VACIO": "Todavía no hay cambios registrados.",
+        "ERROR": "No se pudo cargar el historial.",
+        "CERRAR": "Cerrar"
       }
     },
     "CONFIGURACION": {
@@ -293,7 +307,8 @@
         "ELEGIR_HORARIO": "Elegí un horario libre",
         "SIN_HUECOS": "No hay huecos libres ese día. Revisá tus franjas de disponibilidad.",
         "CONFIRMAR": "Agendar",
-        "CREADA": "Visita agendada."
+        "CREADA": "Visita agendada.",
+        "ERROR_HUECOS": "No se pudieron consultar los horarios disponibles."
       },
       "CANCELAR": {
         "TITULO": "Cancelar la visita",
@@ -315,7 +330,10 @@
         "AGREGAR": "Franja",
         "SIN_FRANJA": "Sin visitas este día.",
         "HASTA": "a",
-        "GUARDADAS": "Disponibilidad guardada."
+        "GUARDADAS": "Disponibilidad guardada.",
+        "DESDE_DIA": "{dia}, desde",
+        "HASTA_DIA": "{dia}, hasta",
+        "QUITAR": "Quitar franja"
       }
     }
   }

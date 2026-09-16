@@ -38,6 +38,15 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
   es el `Banner` de upstream debajo del encabezado de la lista que pide el permiso de push con
   un gesto y guarda la suscripción; desaparece cuando este browser ya está suscripto o el asesor
   lo negó. El service worker que muestra el push es `public/sw.js`.
+- `components/DialogoAsesor.vue`: compone el Dialog nativo de upstream. En teléfono ocupa el
+  viewport dinámico, mantiene acciones visibles y deja desplazar sólo el cuerpo. No recrea
+  foco, Escape, backdrop ni botones. `clasesAsesor.js` agrupa las utilities opt-in del shell
+  para controles táctiles y áreas seguras.
+- `components/ficha/HistorialBusqueda.vue`: presenta `GET /mi/api/cambios` con antes/después y
+  procedencia. `CampoBusqueda.vue` permite corregir sin perder el borrador ante un error.
+  No interpreta la prosa del copiloto ni inventa un protocolo para aceptar/descartar sugerencias.
+- `api/conversaciones.js`: recorre las páginas de conversaciones propias abiertas para enviar
+  una ficha o agendar desde la lista completa.
 - `composables/`: `usePorteliaUi` (el flag), `useEntradasAsesor` (la lista de entradas que
   comparten el sidebar y la barra; Configuración sólo para administradores), `useBarraInferior`
   (cuándo se ve la barra).

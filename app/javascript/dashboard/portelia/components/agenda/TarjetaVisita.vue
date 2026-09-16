@@ -51,45 +51,56 @@ const rutaPropiedad = computed(() =>
 </script>
 
 <template>
-  <CardLayout layout="row" class="!items-start gap-4">
-    <div class="flex flex-col items-start w-14 shrink-0 gap-1.5">
-      <span class="text-lg font-medium text-n-slate-12">
-        {{ horaDe(visita.at) }}
-      </span>
-      <Label
-        :label="t(`PORTELIA.FICHA.VISITAS.ESTADO.${visita.estado}`)"
-        :color="COLOR_ESTADO[visita.estado]"
-        compact
-      />
-    </div>
-    <div class="flex flex-col flex-1 min-w-0 gap-1">
-      <RouterLink
-        :to="rutaHilo"
-        class="text-base font-medium truncate text-n-slate-12 hover:underline"
+  <CardLayout class="[&>div]:p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
+      <div
+        class="flex items-center gap-3 sm:flex-col sm:items-start sm:w-28 shrink-0"
       >
-        {{ nombrePersona || t('PORTELIA.AGENDA.PERSONA_SIN_NOMBRE') }}
-      </RouterLink>
-      <RouterLink
-        :to="rutaPropiedad"
-        class="text-sm truncate text-n-slate-11 hover:underline"
-      >
-        {{ nombrePropiedad(visita.propiedad) }}
-      </RouterLink>
-      <p v-if="visita.motivoCancelacion" class="mb-0 text-sm text-n-slate-11">
-        {{ visita.motivoCancelacion }}
-      </p>
-      <div v-if="acciones.length" class="flex flex-wrap gap-1.5 mt-1">
-        <Button
-          v-for="accion in acciones"
-          :key="accion.estado"
-          :label="t(`PORTELIA.AGENDA.ACCION.${accion.estado}`)"
-          :icon="accion.icon"
-          :color="accion.color"
-          variant="faded"
-          size="xs"
-          :disabled="ocupada"
-          @click="emit('mover', accion.estado)"
+        <span class="text-lg font-medium text-n-slate-12">
+          {{ horaDe(visita.at) }}
+        </span>
+        <Label
+          :label="t(`PORTELIA.FICHA.VISITAS.ESTADO.${visita.estado}`)"
+          :color="COLOR_ESTADO[visita.estado]"
+          compact
         />
+      </div>
+      <div class="flex flex-col flex-1 min-w-0 gap-1">
+        <RouterLink
+          :to="rutaHilo"
+          class="flex items-center min-h-11 text-base font-medium text-n-slate-12 hover:underline break-words"
+        >
+          {{ nombrePersona || t('PORTELIA.AGENDA.PERSONA_SIN_NOMBRE') }}
+        </RouterLink>
+        <RouterLink
+          :to="rutaPropiedad"
+          class="flex items-center min-h-11 text-sm text-n-slate-11 hover:underline break-words"
+        >
+          {{ nombrePropiedad(visita.propiedad) }}
+        </RouterLink>
+        <p
+          v-if="visita.motivoCancelacion"
+          class="mb-0 text-sm text-n-slate-11 break-words"
+        >
+          {{ visita.motivoCancelacion }}
+        </p>
+        <div
+          v-if="acciones.length"
+          class="grid grid-cols-2 gap-2 mt-1 sm:flex sm:flex-wrap"
+        >
+          <Button
+            v-for="accion in acciones"
+            :key="accion.estado"
+            :label="t(`PORTELIA.AGENDA.ACCION.${accion.estado}`)"
+            :icon="accion.icon"
+            :color="accion.color"
+            variant="faded"
+            size="sm"
+            class="min-h-11"
+            :disabled="ocupada"
+            @click="emit('mover', accion.estado)"
+          />
+        </div>
       </div>
     </div>
   </CardLayout>
