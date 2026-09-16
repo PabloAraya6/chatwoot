@@ -48,12 +48,11 @@ const alElegirPropiedad = () => {
 
   if (!propiedad) return;
 
-  if (['venta', 'alquiler'].includes(propiedad.operacion))
-    tipo.value = propiedad.operacion;
-
-  if (propiedad.precio) precio.value = propiedad.precio;
-
-  if (propiedad.moneda) moneda.value = propiedad.moneda;
+  tipo.value = ['venta', 'alquiler'].includes(propiedad.operacion)
+    ? propiedad.operacion
+    : '';
+  precio.value = propiedad.precio ?? '';
+  moneda.value = propiedad.moneda ?? 'USD';
 };
 
 watch(propiedadId, alElegirPropiedad);
@@ -69,6 +68,7 @@ const abrir = (propiedadInicial = '') => {
 };
 
 const guardar = async () => {
+  if (guardando.value || incompleto.value) return;
   guardando.value = true;
 
   try {

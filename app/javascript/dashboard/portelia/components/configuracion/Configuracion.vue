@@ -5,6 +5,7 @@ import { useAlert } from 'dashboard/composables';
 import BaseSettingsHeader from 'dashboard/routes/dashboard/settings/components/BaseSettingsHeader.vue';
 import SectionLayout from 'dashboard/routes/dashboard/settings/account/components/SectionLayout.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
@@ -95,6 +96,9 @@ const aCuenta = () => ({
 });
 
 const cargar = async () => {
+  cargando.value = true;
+  error.value = '';
+
   try {
     const [respuestaCuenta, respuestaGasto] = await Promise.all([
       miApi.get('cuenta'),
@@ -142,6 +146,15 @@ onMounted(cargar);
       <div v-if="cargando" class="flex justify-center py-20">
         <Spinner />
       </div>
+      <Banner
+        v-else-if="!cuenta"
+        color="ruby"
+        role="alert"
+        :action-label="t('PORTELIA.REINTENTAR')"
+        @action="cargar"
+      >
+        {{ error }}
+      </Banner>
       <form v-else class="flex flex-col mt-3" @submit.prevent="guardar">
         <SectionLayout
           :title="t('PORTELIA.CONFIGURACION.SECRETARIA.TITULO')"

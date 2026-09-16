@@ -2,8 +2,8 @@
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { useAlert } from 'dashboard/composables';
 import { useAccount } from 'dashboard/composables/useAccount';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
@@ -27,6 +27,8 @@ const propiedades = ref([]);
 
 const cargando = ref(true);
 
+const fallo = ref(false);
+
 const busqueda = ref('');
 
 const estado = ref('');
@@ -47,11 +49,12 @@ const opcionesOperacion = computed(() => [
 
 const cargar = async () => {
   cargando.value = true;
+  fallo.value = false;
 
   try {
     propiedades.value = (await miApi.get('propiedades')).data;
   } catch {
-    useAlert(t('PORTELIA.PROPIEDADES.ERROR_CARGA'));
+    fallo.value = true;
   } finally {
     cargando.value = false;
   }
@@ -167,6 +170,15 @@ onMounted(() => {
           <div v-if="cargando" class="flex justify-center py-20">
             <Spinner />
           </div>
+          <Banner
+            v-else-if="fallo"
+            color="ruby"
+            role="alert"
+            :action-label="t('PORTELIA.REINTENTAR')"
+            @action="cargar"
+          >
+            {{ t('PORTELIA.PROPIEDADES.ERROR_CARGA') }}
+          </Banner>
           <EmptyStateLayout
             v-else-if="!propiedades.length"
             :title="t('PORTELIA.PROPIEDADES.VACIO_TITULO')"

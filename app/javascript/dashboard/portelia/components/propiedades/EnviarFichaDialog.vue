@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAlert } from 'dashboard/composables';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import ConversationApi from 'dashboard/api/inbox/conversation';
 import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import miApi from '../../api/miApi';
@@ -20,7 +22,9 @@ const conversaciones = ref([]);
 
 const conversacionId = ref('');
 
-const cargando = ref(false);
+const { run, isPending: cargando } = useAbortableRequest();
+
+const fallo = ref(false);
 
 const enviando = ref(false);
 
@@ -41,25 +45,49 @@ const opciones = computed(() =>
 
 // Las conversaciones abiertas del asesor: la ficha sólo se manda a quien ya está hablando.
 const cargar = async () => {
-  cargando.value = true;
+  conversaciones.value = [];
+  fallo.value = false;
 
   try {
-    const { data } = await ConversationApi.get({
-      status: 'open',
-      assigneeType: 'me',
-      page: 1,
+    const respuesta = await run(async signal => {
+      const lista = [];
+      let page = 1;
+      let total;
+
+      do {
+        // Each page's metadata determines whether another request is needed.
+        // eslint-disable-next-line no-await-in-loop
+        const { data } = await ConversationApi.get({
+          status: 'open',
+          assigneeType: 'me',
+          page,
+        });
+        if (signal.aborted) return undefined;
+        const { payload, meta } = data.data;
+        lista.push(...payload);
+        total = meta.mine_count;
+        if (!payload.length) break;
+        page += 1;
+      } while (lista.length < total);
+
+      return lista;
     });
 
-    conversaciones.value = data.data.payload;
+    if (respuesta) conversaciones.value = respuesta;
   } catch {
-    conversaciones.value = [];
-  } finally {
-    cargando.value = false;
+    fallo.value = true;
   }
 };
 
+const puedeEnviar = computed(
+  () =>
+    !cargando.value &&
+    !fallo.value &&
+    opciones.value.some(opcion => opcion.value === conversacionId.value)
+);
+
 const enviar = async () => {
-  if (!conversacionId.value || enviando.value) return;
+  if (!puedeEnviar.value || enviando.value) return;
   enviando.value = true;
 
   try {
@@ -101,12 +129,21 @@ defineExpose({ abrir });
     :description="t('PORTELIA.PROPIEDADES.ENVIAR.DESCRIPCION')"
     :confirm-button-label="t('PORTELIA.PROPIEDADES.ENVIAR.CONFIRMAR')"
     :is-loading="enviando"
-    :disable-confirm-button="!conversacionId"
+    :disable-confirm-button="!puedeEnviar"
     @confirm="enviar"
   >
     <div v-if="cargando" class="flex justify-center py-4">
       <Spinner />
     </div>
+    <Banner
+      v-else-if="fallo"
+      color="ruby"
+      role="alert"
+      :action-label="t('PORTELIA.REINTENTAR')"
+      @action="cargar"
+    >
+      {{ t('PORTELIA.PROPIEDADES.ENVIAR.ERROR_CARGA') }}
+    </Banner>
     <p v-else-if="!opciones.length" class="mb-0 text-sm text-n-slate-11">
       {{ t('PORTELIA.PROPIEDADES.ENVIAR.SIN_CONVERSACIONES') }}
     </p>
