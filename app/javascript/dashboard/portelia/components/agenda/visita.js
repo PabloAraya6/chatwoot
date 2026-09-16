@@ -3,11 +3,18 @@
 // el formato de fechas del asesor.
 
 export const TRANSICIONES = {
-  pendiente: ['confirmada', 'realizada', 'cancelada', 'no_se_presento'],
-  confirmada: ['realizada', 'cancelada', 'no_se_presento'],
+  pendiente: [
+    'confirmada',
+    'realizada',
+    'cancelada',
+    'no_se_presento',
+    'reprogramada',
+  ],
+  confirmada: ['realizada', 'cancelada', 'no_se_presento', 'reprogramada'],
   realizada: [],
   cancelada: [],
   no_se_presento: [],
+  reprogramada: [],
 };
 
 export const COLOR_ESTADO = {
@@ -16,6 +23,7 @@ export const COLOR_ESTADO = {
   realizada: 'teal',
   cancelada: 'ruby',
   no_se_presento: 'ruby',
+  reprogramada: 'amber',
 };
 
 export const DIAS_SEMANA = [1, 2, 3, 4, 5, 6, 0];

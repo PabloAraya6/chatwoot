@@ -25,6 +25,7 @@ const { accountScopedRoute } = useAccount();
 const ACCIONES = [
   { estado: 'confirmada', icon: 'i-lucide-check', color: 'blue' },
   { estado: 'realizada', icon: 'i-lucide-check-check', color: 'teal' },
+  { estado: 'reprogramada', icon: 'i-lucide-calendar-clock', color: 'amber' },
   { estado: 'no_se_presento', icon: 'i-lucide-user-x', color: 'slate' },
   { estado: 'cancelada', icon: 'i-lucide-x', color: 'ruby' },
 ];

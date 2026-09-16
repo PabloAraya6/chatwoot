@@ -183,7 +183,8 @@
           "confirmada": "confirmada",
           "realizada": "realizada",
           "cancelada": "cancelada",
-          "no_se_presento": "no se presentó"
+          "no_se_presento": "no se presentó",
+          "reprogramada": "reprogramada"
         }
       },
       "REACCIONES": {
@@ -282,6 +283,7 @@
       "ACCION": {
         "confirmada": "Confirmar",
         "realizada": "Realizada",
+        "reprogramada": "Reprogramar",
         "no_se_presento": "No vino",
         "cancelada": "Cancelar"
       },
