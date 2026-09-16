@@ -57,6 +57,7 @@ const abrir = (propiedadInicial = '') => {
 };
 
 const guardar = async () => {
+  if (guardando.value || incompleto.value) return;
   guardando.value = true;
 
   try {

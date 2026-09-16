@@ -3,7 +3,10 @@ import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from 'vue-i18n';
 import { useAlert } from 'dashboard/composables';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import { useMapGetter } from 'dashboard/composables/store';
+import ConversationApi from 'dashboard/api/inbox/conversation';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import miApi from '../api/miApi';
 
@@ -37,11 +40,28 @@ const traspaso = computed(
       ?.content_attributes.traspaso
 );
 
-const tomar = () =>
-  store.dispatch('assignAgent', {
-    conversationId: props.chat.id,
-    agentId: currentUserId.value,
-  });
+const tomando = ref(false);
+
+const tomar = async () => {
+  if (tomando.value) return;
+  tomando.value = true;
+  const conversationId = props.chat.id;
+
+  try {
+    const { data } = await ConversationApi.assignAgent({
+      conversationId,
+      agentId: currentUserId.value,
+    });
+    await store.dispatch('setCurrentChatAssignee', {
+      conversationId,
+      assignee: data,
+    });
+  } catch {
+    useAlert(t('PORTELIA.HILO.TOMAR_ERROR'));
+  } finally {
+    tomando.value = false;
+  }
+};
 
 // El estado lo deriva la API del mismo hilo que lee la secretaria; se relee cuando cambia
 // la conversación o llega un mensaje, que es lo único que lo mueve.
@@ -49,13 +69,21 @@ const secretaria = ref(null);
 
 const devolviendo = ref(false);
 
+const estadoFallido = ref(false);
+
+const { run } = useAbortableRequest();
+
 const leerSecretaria = async () => {
+  secretaria.value = null;
+  estadoFallido.value = false;
+
   try {
-    secretaria.value = (
-      await miApi.get(`conversaciones/${props.chat.id}/secretaria`)
-    ).data;
+    const respuesta = await run(signal =>
+      miApi.get(`conversaciones/${props.chat.id}/secretaria`, { signal })
+    );
+    if (respuesta) secretaria.value = respuesta.data;
   } catch {
-    secretaria.value = null;
+    estadoFallido.value = true;
   }
 };
 
@@ -108,9 +136,20 @@ const devolver = async () => {
         icon="i-lucide-hand"
         size="sm"
         color="blue"
+        :is-loading="tomando"
+        :disabled="tomando"
         @click="tomar"
       />
     </div>
+    <Banner
+      v-if="estadoFallido"
+      color="amber"
+      role="alert"
+      :action-label="t('PORTELIA.REINTENTAR')"
+      @action="leerSecretaria"
+    >
+      {{ t('PORTELIA.HILO.ESTADO_ERROR') }}
+    </Banner>
     <div v-if="calla" class="flex items-center justify-between gap-2">
       <span class="flex items-center gap-1.5 text-n-slate-11">
         <span class="i-lucide-bot-off size-4 shrink-0" />
@@ -123,6 +162,7 @@ const devolver = async () => {
         variant="faded"
         color="slate"
         :is-loading="devolviendo"
+        :disabled="devolviendo"
         @click="devolver"
       />
     </div>

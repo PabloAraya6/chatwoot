@@ -1,10 +1,12 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAlert } from 'dashboard/composables';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import { useAccount } from 'dashboard/composables/useAccount';
 import Breadcrumb from 'dashboard/components-next/breadcrumb/Breadcrumb.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Label from 'dashboard/components-next/label/Label.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
@@ -26,7 +28,9 @@ const { accountScopedRoute } = useAccount();
 
 const propiedad = ref(null);
 
-const cargando = ref(true);
+const { run, isPending: cargando } = useAbortableRequest();
+
+const fallo = ref(false);
 
 const enviarRef = ref(null);
 
@@ -74,17 +78,21 @@ const datos = computed(() => {
 });
 
 const cargar = async () => {
-  cargando.value = true;
+  propiedad.value = null;
+  fallo.value = false;
 
   try {
-    propiedad.value = (
-      await miApi.get(`propiedades/${props.propiedadId}`)
-    ).data;
-  } catch {
-    useAlert(t('PORTELIA.PROPIEDADES.FICHA.NO_EXISTE'));
-    router.replace(accountScopedRoute('portelia_propiedades'));
-  } finally {
-    cargando.value = false;
+    const respuesta = await run(signal =>
+      miApi.get(`propiedades/${props.propiedadId}`, { signal })
+    );
+    if (respuesta) propiedad.value = respuesta.data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      useAlert(t('PORTELIA.PROPIEDADES.FICHA.NO_EXISTE'));
+      router.replace(accountScopedRoute('portelia_propiedades'));
+    } else {
+      fallo.value = true;
+    }
   }
 };
 
@@ -97,7 +105,7 @@ const editar = () =>
     })
   );
 
-onMounted(cargar);
+watch(() => props.propiedadId, cargar, { immediate: true });
 </script>
 
 <template>
@@ -130,6 +138,15 @@ onMounted(cargar);
         <div v-if="cargando" class="flex justify-center py-20">
           <Spinner />
         </div>
+        <Banner
+          v-else-if="fallo"
+          color="ruby"
+          role="alert"
+          :action-label="t('PORTELIA.REINTENTAR')"
+          @action="cargar"
+        >
+          {{ t('PORTELIA.PROPIEDADES.ERROR_CARGA') }}
+        </Banner>
         <article
           v-else-if="propiedad"
           class="flex flex-col w-full gap-6 mx-auto max-w-[40.625rem]"

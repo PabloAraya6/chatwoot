@@ -14,7 +14,8 @@ const opciones = () => ({
 });
 
 export default {
-  get: ruta => axios.get(url(ruta), opciones()),
+  get: (ruta, { signal } = {}) =>
+    axios.get(url(ruta), { ...opciones(), signal }),
   post: (ruta, datos) => axios.post(url(ruta), datos, opciones()),
   put: (ruta, datos) => axios.put(url(ruta), datos, opciones()),
   patch: (ruta, datos) => axios.patch(url(ruta), datos, opciones()),

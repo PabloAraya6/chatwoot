@@ -1,8 +1,10 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useAlert } from 'dashboard/composables';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Label from 'dashboard/components-next/label/Label.vue';
@@ -31,7 +33,7 @@ const conversationId = computed(
   () => Number(route.params.conversation_id) || 0
 );
 
-const cargando = ref(true);
+const { run, isPending: cargando } = useAbortableRequest();
 
 const fallo = ref(false);
 
@@ -78,14 +80,18 @@ const propiedadDe = id => nombrePropiedad(porId.value.get(id));
 const vigentes = computed(() => busquedas.value.filter(b => b.vigente));
 
 const cargar = async () => {
-  cargando.value = true;
   fallo.value = false;
 
   try {
-    const [persona, lista] = await Promise.all([
-      miApi.get(`personas/${props.contactId}`),
-      miApi.get('propiedades'),
-    ]);
+    const respuesta = await run(signal =>
+      Promise.all([
+        miApi.get(`personas/${props.contactId}`, { signal }),
+        miApi.get('propiedades', { signal }),
+      ])
+    );
+
+    if (!respuesta) return;
+    const [persona, lista] = respuesta;
 
     busquedas.value = persona.data.busquedas;
     visitas.value = persona.data.visitas;
@@ -94,8 +100,6 @@ const cargar = async () => {
     propiedades.value = lista.data;
   } catch {
     fallo.value = true;
-  } finally {
-    cargando.value = false;
   }
 };
 
@@ -134,9 +138,7 @@ const alCrearOperacion = () => {
   cargar();
 };
 
-onMounted(cargar);
-
-watch(() => props.contactId, cargar);
+watch(() => props.contactId, cargar, { immediate: true });
 </script>
 
 <template>
@@ -144,9 +146,15 @@ watch(() => props.contactId, cargar);
     <div v-if="cargando" class="flex justify-center py-6 text-n-slate-11">
       <Spinner />
     </div>
-    <p v-else-if="fallo" class="text-n-slate-11">
+    <Banner
+      v-else-if="fallo"
+      color="ruby"
+      role="alert"
+      :action-label="t('PORTELIA.REINTENTAR')"
+      @action="cargar"
+    >
       {{ t('PORTELIA.FICHA.ERROR_CARGAR') }}
-    </p>
+    </Banner>
     <template v-else>
       <section class="flex flex-col gap-2">
         <h4 class="text-sm font-medium text-n-slate-12">
@@ -235,6 +243,10 @@ watch(() => props.contactId, cargar);
             <span v-if="reaccion.motivo" class="text-n-slate-11">
               {{ reaccion.motivo }}
             </span>
+            <Label
+              :label="t(`PORTELIA.FICHA.PROCEDENCIA.${reaccion.procedencia}`)"
+              compact
+            />
           </div>
           <Label
             :label="t(`PORTELIA.FICHA.VEREDICTO.${reaccion.veredicto}`)"

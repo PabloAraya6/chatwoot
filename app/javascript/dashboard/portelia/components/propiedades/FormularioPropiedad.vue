@@ -1,10 +1,12 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAlert } from 'dashboard/composables';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import { useAccount } from 'dashboard/composables/useAccount';
 import Breadcrumb from 'dashboard/components-next/breadcrumb/Breadcrumb.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Checkbox from 'dashboard/components-next/checkbox/Checkbox.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
@@ -33,7 +35,7 @@ const { accountScopedRoute } = useAccount();
 
 const esNueva = computed(() => !props.propiedadId);
 
-const cargando = ref(!esNueva.value);
+const { run, abort, isPending: cargando } = useAbortableRequest();
 
 const guardando = ref(false);
 
@@ -63,7 +65,7 @@ const TEXTOS = [
   'urlAviso',
 ];
 
-const campos = reactive({
+const camposIniciales = {
   tipo: 'departamento',
   operacion: 'venta',
   estado: 'disponible',
@@ -72,7 +74,9 @@ const campos = reactive({
   amenities: '',
   fotos: '',
   ...Object.fromEntries([...NUMERICOS, ...TEXTOS].map(campo => [campo, ''])),
-});
+};
+
+const campos = reactive({ ...camposIniciales });
 
 const tituloMiga = () => {
   if (esNueva.value) return t('PORTELIA.PROPIEDADES.FORMULARIO.NUEVA');
@@ -95,9 +99,9 @@ const opciones = {
   ]),
 };
 
-const lineas = texto =>
+const lineas = (texto, separador = /\r?\n|,/) =>
   texto
-    .split(/\r?\n|,/)
+    .split(separador)
     .map(linea => linea.trim())
     .filter(Boolean);
 
@@ -108,7 +112,7 @@ const aPropiedad = () => {
     estado: campos.estado,
     cochera: campos.cochera,
     amenities: lineas(campos.amenities),
-    fotos: lineas(campos.fotos),
+    fotos: lineas(campos.fotos, /\r?\n/),
   };
 
   if (campos.moneda) propiedad.moneda = campos.moneda;
@@ -153,14 +157,29 @@ const delta = () => {
 };
 
 const cargar = async () => {
+  original.value = null;
+  error.value = '';
+
+  if (esNueva.value) {
+    abort();
+    Object.assign(campos, camposIniciales);
+    return;
+  }
+
   try {
-    original.value = (await miApi.get(`propiedades/${props.propiedadId}`)).data;
+    const respuesta = await run(signal =>
+      miApi.get(`propiedades/${props.propiedadId}`, { signal })
+    );
+    if (!respuesta) return;
+    original.value = respuesta.data;
     desdePropiedad(original.value);
-  } catch {
-    useAlert(t('PORTELIA.PROPIEDADES.FICHA.NO_EXISTE'));
-    router.replace(accountScopedRoute('portelia_propiedades'));
-  } finally {
-    cargando.value = false;
+  } catch (e) {
+    if (e.response?.status === 404) {
+      useAlert(t('PORTELIA.PROPIEDADES.FICHA.NO_EXISTE'));
+      router.replace(accountScopedRoute('portelia_propiedades'));
+    } else {
+      error.value = t('PORTELIA.PROPIEDADES.ERROR_CARGA');
+    }
   }
 };
 
@@ -192,9 +211,7 @@ const guardar = async () => {
   }
 };
 
-onMounted(() => {
-  if (!esNueva.value) cargar();
-});
+watch(() => props.propiedadId, cargar, { immediate: true });
 </script>
 
 <template>
@@ -209,6 +226,15 @@ onMounted(() => {
         <div v-if="cargando" class="flex justify-center py-20">
           <Spinner />
         </div>
+        <Banner
+          v-else-if="!esNueva && !original"
+          color="ruby"
+          role="alert"
+          :action-label="t('PORTELIA.REINTENTAR')"
+          @action="cargar"
+        >
+          {{ error }}
+        </Banner>
         <form
           v-else
           class="flex flex-col w-full gap-6 mx-auto max-w-[40.625rem]"

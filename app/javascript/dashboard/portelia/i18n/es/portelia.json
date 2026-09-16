@@ -1,5 +1,6 @@
 {
   "PORTELIA": {
+    "REINTENTAR": "Reintentar",
     "SIDEBAR": {
       "BANDEJA": "Bandeja",
       "PERSONAS": "Personas",
@@ -15,6 +16,8 @@
       "MIO": "La atendés vos",
       "OTRO": "La atiende {nombre}",
       "TOMAR": "Tomar",
+      "TOMAR_ERROR": "No se pudo tomar la conversación. Probá de nuevo.",
+      "ESTADO_ERROR": "No se pudo consultar el estado de la secretaria.",
       "TRASPASO": "La secretaria te la pasa.",
       "CALLA": "La secretaria calla en esta conversación.",
       "DEVOLVER": "Devolvérsela",
@@ -133,6 +136,7 @@
         "CONVERSACION": "Conversación",
         "ELEGIR": "Elegí una conversación",
         "SIN_CONVERSACIONES": "No tenés conversaciones abiertas asignadas.",
+        "ERROR_CARGA": "No se pudieron cargar las conversaciones.",
         "CONFIRMAR": "Mandar",
         "ENVIADA": "Ficha enviada con la foto.",
         "ENVIADA_SIN_FOTO": "Ficha enviada. La foto no se pudo bajar, fue el texto solo.",
@@ -151,7 +155,7 @@
       "ERROR_GUARDAR": "No se pudo guardar. Probá de nuevo.",
       "PROCEDENCIA": {
         "humano": "asesor",
-        "asistente": "secretaria",
+        "asistente": "IA · secretaria",
         "web": "web"
       },
       "CAMPOS": {
@@ -200,7 +204,7 @@
         "VACIAS": "Sin operación.",
         "CREAR": "Crear",
         "NUEVA": "Nueva operación",
-        "DESCRIPCION": "Reserva la propiedad y cierra la Búsqueda vigente de esta persona.",
+        "DESCRIPCION": "Reserva la propiedad. La Búsqueda sigue vigente hasta que se cierre la Operación.",
         "TIPO": "Tipo",
         "PRECIO": "Precio",
         "ESTADO": {
