@@ -1,7 +1,7 @@
 import { flushPromises, shallowMount } from '@vue/test-utils';
 import ConversationApi from 'dashboard/api/inbox/conversation';
 import Banner from 'dashboard/components-next/banner/Banner.vue';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import Dialog from '../DialogoAsesor.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import miApi from '../../api/miApi';
 import EnviarFichaDialog from './EnviarFichaDialog.vue';
@@ -23,7 +23,10 @@ describe('EnviarFichaDialog', () => {
     ConversationApi.get.mockRejectedValueOnce(new Error('offline'));
     const wrapper = shallowMount(EnviarFichaDialog, {
       props: { propiedadId: 'p' },
-      global: { stubs: { Dialog: DialogStub }, renderStubDefaultSlot: true },
+      global: {
+        stubs: { DialogoAsesor: DialogStub },
+        renderStubDefaultSlot: true,
+      },
     });
     wrapper.vm.abrir('999');
     await flushPromises();
@@ -70,7 +73,7 @@ describe('EnviarFichaDialog', () => {
     );
     const wrapper = shallowMount(EnviarFichaDialog, {
       props: { propiedadId: 'p' },
-      global: { stubs: { Dialog: DialogStub } },
+      global: { stubs: { DialogoAsesor: DialogStub } },
     });
     wrapper.vm.abrir('200');
     await flushPromises();

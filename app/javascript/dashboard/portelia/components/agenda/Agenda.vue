@@ -1,10 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 import { useAlert } from 'dashboard/composables';
 import Button from 'dashboard/components-next/button/Button.vue';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import EmptyStateLayout from 'dashboard/components-next/EmptyStateLayout.vue';
 import miApi from '../../api/miApi';
@@ -39,6 +40,8 @@ const propiedades = ref([]);
 
 const cargando = ref(true);
 
+const fallo = ref(false);
+
 const ocupadaId = ref('');
 
 const seleccionada = ref(null);
@@ -67,6 +70,7 @@ const traerNombres = () => {
 
 const cargar = async () => {
   cargando.value = true;
+  fallo.value = false;
 
   try {
     const desde = inicioDelDia(hoy());
@@ -83,7 +87,7 @@ const cargar = async () => {
     propiedades.value = lista.data;
     traerNombres();
   } catch {
-    useAlert(t('PORTELIA.AGENDA.ERROR_CARGA'));
+    fallo.value = true;
   } finally {
     cargando.value = false;
   }
@@ -110,6 +114,7 @@ const reemplazar = visita => {
 };
 
 const patch = async (visita, cuerpo) => {
+  if (ocupadaId.value) return null;
   ocupadaId.value = visita.id;
 
   try {
@@ -130,9 +135,10 @@ const patch = async (visita, cuerpo) => {
 
 // Cancelar pide motivo antes; realizada abre la Reacción después (ticket 07, punto 3).
 const mover = async (visita, estado) => {
-  seleccionada.value = visita;
+  if (ocupadaId.value) return;
 
   if (estado === 'cancelada') {
+    seleccionada.value = visita;
     cancelarRef.value?.abrir();
 
     return;
@@ -140,8 +146,11 @@ const mover = async (visita, estado) => {
 
   const movida = await patch(visita, { estado });
 
-  if (movida && estado === 'realizada')
+  if (movida && estado === 'realizada') {
+    seleccionada.value = visita;
+    await nextTick();
     nuevaReaccionRef.value?.abrir(visita.propiedadId);
+  }
 };
 
 const cancelar = async motivoCancelacion => {
@@ -181,11 +190,13 @@ onMounted(cargar);
 </script>
 
 <template>
-  <section class="flex w-full h-full overflow-hidden bg-n-surface-1">
-    <div class="flex flex-col w-full h-full">
-      <header class="sticky top-0 z-20 px-6">
+  <section
+    class="flex w-full min-w-0 h-full overflow-hidden bg-n-surface-1 [&_button:not([role=switch])]:min-h-11 [&_button:not([role=switch])]:min-w-11 [&_input:not([type=checkbox])]:min-h-11 [&_select]:min-h-11 max-sm:[&_input]:text-base max-sm:[&_select]:text-base motion-reduce:[&_*]:!transition-none"
+  >
+    <div class="flex flex-col w-full min-w-0 h-full">
+      <header class="sticky top-0 z-20 px-4 sm:px-6">
         <div
-          class="flex flex-col w-full gap-3 py-6 mx-auto max-w-5xl sm:flex-row sm:items-center sm:justify-between"
+          class="flex flex-col w-full gap-3 py-4 sm:py-6 mx-auto max-w-5xl sm:flex-row sm:items-center sm:justify-between"
         >
           <span class="text-xl font-medium truncate text-n-slate-12">
             {{ t('PORTELIA.AGENDA.TITULO') }}
@@ -208,11 +219,20 @@ onMounted(cargar);
           </div>
         </div>
       </header>
-      <main class="flex-1 px-6 pb-6 overflow-y-auto">
+      <main class="flex-1 min-h-0 px-4 sm:px-6 pb-6 overflow-y-auto">
         <div class="flex flex-col w-full gap-8 mx-auto max-w-5xl">
           <div v-if="cargando" class="flex justify-center py-20">
             <Spinner />
           </div>
+          <Banner
+            v-else-if="fallo"
+            color="ruby"
+            role="alert"
+            :action-label="t('PORTELIA.REINTENTAR')"
+            @action="cargar"
+          >
+            {{ t('PORTELIA.AGENDA.ERROR_CARGA') }}
+          </Banner>
           <template v-else>
             <section class="flex flex-col gap-3">
               <h2 class="mb-0 text-base font-medium text-n-slate-12">
@@ -232,7 +252,7 @@ onMounted(cargar);
                 :key="visita.id"
                 :visita="visita"
                 :nombre-persona="nombreDe(visita.contactId)"
-                :ocupada="ocupadaId === visita.id"
+                :ocupada="Boolean(ocupadaId)"
                 @mover="estado => mover(visita, estado)"
               />
             </section>
@@ -259,7 +279,7 @@ onMounted(cargar);
                   :key="visita.id"
                   :visita="visita"
                   :nombre-persona="nombreDe(visita.contactId)"
-                  :ocupada="ocupadaId === visita.id"
+                  :ocupada="Boolean(ocupadaId)"
                   @mover="estado => mover(visita, estado)"
                 />
               </div>
@@ -270,7 +290,11 @@ onMounted(cargar);
     </div>
 
     <NuevaVisita ref="nuevaVisitaRef" @creada="alCrearVisita" />
-    <CancelarVisita ref="cancelarRef" @cancelar="cancelar" />
+    <CancelarVisita
+      ref="cancelarRef"
+      :guardando="Boolean(ocupadaId)"
+      @cancelar="cancelar"
+    />
     <Disponibilidad ref="disponibilidadRef" />
     <template v-if="seleccionada">
       <NuevaReaccion
@@ -280,7 +304,7 @@ onMounted(cargar);
         :visitas="visitas"
         @creada="alCrearReaccion"
       />
-      <Dialog
+      <DialogoAsesor
         ref="cierreRef"
         :title="t('PORTELIA.AGENDA.CIERRE.TITULO')"
         :description="t('PORTELIA.AGENDA.CIERRE.DESCRIPCION')"

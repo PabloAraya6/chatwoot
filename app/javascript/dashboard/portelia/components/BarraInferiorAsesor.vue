@@ -12,13 +12,14 @@ const activa = entrada =>
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-40 flex h-14 border-t border-n-weak bg-n-solid-1 pb-[env(safe-area-inset-bottom)] md:hidden"
+    class="fixed inset-x-0 bottom-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-bottom))] border-t border-n-weak bg-n-solid-1 pb-[env(safe-area-inset-bottom)] md:hidden"
   >
     <RouterLink
       v-for="entrada in entradas"
       :key="entrada.name"
       :to="entrada.to"
-      class="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium leading-none"
+      :aria-current="activa(entrada) ? 'page' : undefined"
+      class="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-xs font-medium leading-none min-h-11 focus-visible:outline focus-visible:outline-2 focus-visible:outline-n-brand focus-visible:-outline-offset-2"
       :class="activa(entrada) ? 'text-n-blue-text' : 'text-n-slate-11'"
     >
       <span class="size-5" :class="entrada.icon" />

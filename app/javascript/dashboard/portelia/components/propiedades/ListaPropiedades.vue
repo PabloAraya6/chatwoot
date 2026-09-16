@@ -107,11 +107,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="flex w-full h-full overflow-hidden bg-n-surface-1">
-    <div class="flex flex-col w-full h-full">
-      <header class="sticky top-0 z-20 px-6">
+  <section
+    class="flex w-full min-w-0 h-full overflow-hidden bg-n-surface-1 [&_button:not([role=switch])]:min-h-11 [&_button:not([role=switch])]:min-w-11 [&_input:not([type=checkbox])]:min-h-11 [&_select]:min-h-11 max-sm:[&_input]:text-base max-sm:[&_select]:text-base motion-reduce:[&_*]:!transition-none"
+  >
+    <div class="flex flex-col w-full min-w-0 h-full">
+      <header class="sticky top-0 z-20 px-4 sm:px-6">
         <div
-          class="flex flex-col w-full gap-3 py-6 mx-auto max-w-5xl sm:flex-row sm:items-center sm:justify-between"
+          class="flex flex-col w-full gap-3 py-4 sm:py-6 mx-auto max-w-5xl sm:flex-row sm:items-center sm:justify-between"
         >
           <span class="text-xl font-medium truncate text-n-slate-12">
             {{ t('PORTELIA.PROPIEDADES.TITULO') }}
@@ -120,6 +122,7 @@ onMounted(() => {
             <Input
               v-model="busqueda"
               type="search"
+              :aria-label="t('PORTELIA.PROPIEDADES.BUSCAR')"
               :placeholder="t('PORTELIA.PROPIEDADES.BUSCAR')"
               :custom-input-class="[
                 'h-8 [&:not(.focus)]:!border-transparent bg-n-alpha-2 dark:bg-n-solid-1 ltr:!pl-8 !py-1 rtl:!pr-8',
@@ -138,13 +141,13 @@ onMounted(() => {
                 v-model="estado"
                 :options="opcionesEstado"
                 :aria-label="t('PORTELIA.PROPIEDADES.TODOS_ESTADOS')"
-                class="flex-1 sm:flex-none [&>select]:w-full"
+                class="min-w-0 flex-1 sm:flex-none [&>select]:w-full"
               />
               <Select
                 v-model="operacion"
                 :options="opcionesOperacion"
                 :aria-label="t('PORTELIA.PROPIEDADES.TODAS_OPERACIONES')"
-                class="flex-1 sm:flex-none [&>select]:w-full"
+                class="min-w-0 flex-1 sm:flex-none [&>select]:w-full"
               />
             </div>
             <div class="hidden w-px h-4 sm:block bg-n-strong" />
@@ -165,7 +168,7 @@ onMounted(() => {
           </div>
         </div>
       </header>
-      <main class="flex-1 px-6 pb-6 overflow-y-auto">
+      <main class="flex-1 min-h-0 px-4 sm:px-6 pb-6 overflow-y-auto">
         <div class="w-full mx-auto max-w-5xl">
           <div v-if="cargando" class="flex justify-center py-20">
             <Spinner />

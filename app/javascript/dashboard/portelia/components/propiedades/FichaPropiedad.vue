@@ -109,11 +109,13 @@ watch(() => props.propiedadId, cargar, { immediate: true });
 </script>
 
 <template>
-  <section class="flex w-full h-full overflow-hidden bg-n-surface-1">
-    <div class="flex flex-col w-full h-full">
-      <header class="sticky top-0 z-10 px-6">
+  <section
+    class="flex w-full min-w-0 h-full overflow-hidden bg-n-surface-1 [&_button:not([role=switch])]:min-h-11 [&_button:not([role=switch])]:min-w-11 [&_input:not([type=checkbox])]:min-h-11 [&_select]:min-h-11 max-sm:[&_input]:text-base max-sm:[&_select]:text-base motion-reduce:[&_*]:!transition-none"
+  >
+    <div class="flex flex-col w-full min-w-0 h-full">
+      <header class="sticky top-0 z-10 px-4 sm:px-6">
         <div
-          class="flex flex-col w-full gap-3 py-6 mx-auto max-w-[40.625rem] sm:flex-row sm:items-center sm:justify-between"
+          class="flex flex-col w-full gap-3 py-4 sm:py-6 mx-auto max-w-[40.625rem] sm:flex-row sm:items-center sm:justify-between"
         >
           <Breadcrumb :items="migas" @click="volver" />
           <div v-if="propiedad" class="flex items-center gap-2">
@@ -134,7 +136,7 @@ watch(() => props.propiedadId, cargar, { immediate: true });
           </div>
         </div>
       </header>
-      <main class="flex-1 px-6 pb-6 overflow-y-auto">
+      <main class="flex-1 min-h-0 px-4 sm:px-6 pb-6 overflow-y-auto">
         <div v-if="cargando" class="flex justify-center py-20">
           <Spinner />
         </div>
@@ -153,7 +155,7 @@ watch(() => props.propiedadId, cargar, { immediate: true });
         >
           <div
             v-if="propiedad.fotos.length"
-            class="flex gap-2 -mx-6 px-6 overflow-x-auto snap-x snap-mandatory sm:mx-0 sm:px-0"
+            class="flex gap-2 -mx-4 px-4 sm:mx-0 overflow-x-auto snap-x snap-mandatory sm:mx-0 sm:px-0"
           >
             <img
               v-for="foto in propiedad.fotos"
@@ -182,7 +184,7 @@ watch(() => props.propiedadId, cargar, { immediate: true });
                 compact
               />
             </div>
-            <h1 class="mb-0 text-2xl font-medium text-n-slate-12">
+            <h1 class="mb-0 text-2xl font-medium break-words text-n-slate-12">
               {{ titulo }}
             </h1>
             <p v-if="lugarDe(propiedad)" class="mb-0 text-sm text-n-slate-11">
@@ -238,14 +240,18 @@ watch(() => props.propiedadId, cargar, { immediate: true });
               >
                 {{ t(`PORTELIA.PROPIEDADES.FICHA.${clave}`) }}
               </dt>
-              <dd class="mb-0 text-sm text-n-slate-12">{{ valor }}</dd>
+              <dd class="mb-0 text-sm text-n-slate-12 break-words">
+                {{ valor }}
+              </dd>
             </div>
           </dl>
           <section v-if="propiedad.descripcion" class="flex flex-col gap-2">
             <h2 class="mb-0 text-base font-medium text-n-slate-12">
               {{ t('PORTELIA.PROPIEDADES.FICHA.DESCRIPCION') }}
             </h2>
-            <p class="mb-0 text-sm whitespace-pre-line text-n-slate-11">
+            <p
+              class="mb-0 text-sm whitespace-pre-line break-words text-n-slate-11"
+            >
               {{ propiedad.descripcion }}
             </p>
           </section>

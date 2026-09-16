@@ -7,6 +7,10 @@ import Button from 'dashboard/components-next/button/Button.vue';
 import TeleportWithDirection from 'dashboard/components-next/TeleportWithDirection.vue';
 
 const props = defineProps({
+  dialogClass: {
+    type: [String, Array, Object],
+    default: '',
+  },
   type: {
     type: String,
     default: 'edit',
@@ -120,6 +124,7 @@ defineExpose({ open, close });
       ref="dialogRef"
       class="w-full transition-all duration-300 ease-in-out shadow-xl rounded-xl"
       :class="[
+        dialogClass,
         maxWidthClass,
         positionClass,
         overflowYAuto ? 'overflow-y-auto' : 'overflow-visible',

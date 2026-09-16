@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAlert } from 'dashboard/composables';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import miApi from '../../api/miApi';
@@ -82,7 +82,7 @@ defineExpose({ abrir });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.FICHA.REACCIONES.NUEVA')"
     :confirm-button-label="t('PORTELIA.FICHA.GUARDAR')"
@@ -116,5 +116,5 @@ defineExpose({ abrir });
         :placeholder="t('PORTELIA.FICHA.REACCIONES.MOTIVO_EJEMPLO')"
       />
     </div>
-  </Dialog>
+  </DialogoAsesor>
 </template>

@@ -114,21 +114,30 @@ const devolver = async () => {
 <template>
   <!-- En el celular el botón flotante del panel del contacto se superpone al borde derecho. -->
   <div
-    class="flex flex-col gap-1.5 border-b border-n-weak bg-n-solid-1 px-3 py-2 text-sm max-md:pr-12"
+    class="flex flex-col gap-1.5 border-b border-n-weak bg-n-solid-1 px-3 py-2 text-sm max-md:pe-20 break-words min-w-0"
   >
-    <div class="flex items-center justify-between gap-2">
-      <span class="flex items-center gap-1.5 font-medium text-n-slate-12">
+    <div
+      class="flex flex-wrap items-center justify-between gap-2 [&_button]:min-h-11 [&_button]:min-w-11"
+    >
+      <span
+        class="flex min-w-0 items-center gap-1.5 font-medium text-n-slate-12"
+      >
         <span
           class="size-4 text-n-slate-11"
           :class="
             estado === 'guardia' ? 'i-lucide-bell-ring' : 'i-lucide-user-check'
           "
         />
-        {{
-          t(`PORTELIA.HILO.${estado.toUpperCase()}`, {
-            nombre: asignado?.name,
-          })
-        }}
+        <span v-if="estado === 'guardia'" class="md:hidden">
+          {{ t('PORTELIA.BANDEJA.GUARDIA') }}
+        </span>
+        <span :class="{ 'hidden md:inline': estado === 'guardia' }">
+          {{
+            t(`PORTELIA.HILO.${estado.toUpperCase()}`, {
+              nombre: asignado?.name,
+            })
+          }}
+        </span>
       </span>
       <Button
         v-if="estado === 'guardia'"
@@ -150,7 +159,7 @@ const devolver = async () => {
     >
       {{ t('PORTELIA.HILO.ESTADO_ERROR') }}
     </Banner>
-    <div v-if="calla" class="flex items-center justify-between gap-2">
+    <div v-if="calla" class="flex flex-wrap items-center justify-between gap-2">
       <span class="flex items-center gap-1.5 text-n-slate-11">
         <span class="i-lucide-bot-off size-4 shrink-0" />
         {{ t('PORTELIA.HILO.CALLA') }}

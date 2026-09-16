@@ -1,9 +1,11 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
 import { useAlert } from 'dashboard/composables';
-import ConversationApi from 'dashboard/api/inbox/conversation';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
+import { conversacionesPropias } from '../../api/conversaciones';
+import DialogoAsesor from '../DialogoAsesor.vue';
 import Select from 'dashboard/components-next/select/Select.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
@@ -39,9 +41,17 @@ const dia = ref(hoy());
 
 const at = ref('');
 
-const cargando = ref(false);
+const {
+  run: runDatos,
+  abort: abortDatos,
+  isPending: cargando,
+} = useAbortableRequest();
 
-const buscandoHuecos = ref(false);
+const { run, abort, isPending: buscandoHuecos } = useAbortableRequest();
+
+const fallo = ref(false);
+
+const falloHuecos = ref(false);
 
 const guardando = ref(false);
 
@@ -81,42 +91,50 @@ const contactoElegido = computed(() => {
 });
 
 const incompleto = computed(
-  () => !contactoElegido.value || !propiedadId.value || !at.value
+  () =>
+    cargando.value ||
+    fallo.value ||
+    buscandoHuecos.value ||
+    falloHuecos.value ||
+    !contactoElegido.value ||
+    !opcionesPropiedad.value.some(p => p.value === propiedadId.value) ||
+    !huecos.value.some(h => h.at === at.value)
 );
 
 const cargar = async () => {
-  cargando.value = true;
-
+  fallo.value = false;
+  propiedades.value = [];
+  conversaciones.value = [];
   try {
-    const pedidos = [miApi.get('propiedades')];
-
-    if (!desdeElHilo.value)
-      pedidos.push(
-        ConversationApi.get({ status: 'open', assigneeType: 'me', page: 1 })
-      );
-    const [lista, abiertas] = await Promise.all(pedidos);
+    const respuesta = await runDatos(signal =>
+      Promise.all([
+        miApi.get('propiedades', { signal }),
+        desdeElHilo.value ? Promise.resolve([]) : conversacionesPropias(signal),
+      ])
+    );
+    if (!respuesta) return;
+    const [lista, abiertas] = respuesta;
     propiedades.value = lista.data;
-    conversaciones.value = abiertas?.data?.data?.payload ?? [];
+    conversaciones.value = abiertas;
   } catch {
-    useAlert(t('PORTELIA.AGENDA.ERROR_CARGA'));
-  } finally {
-    cargando.value = false;
+    fallo.value = true;
   }
 };
 
 const buscarHuecos = async () => {
+  abort();
   at.value = '';
   huecos.value = [];
-
+  falloHuecos.value = false;
   if (!dia.value) return;
-  buscandoHuecos.value = true;
 
   try {
-    huecos.value = (await miApi.get(`agenda/huecos?dia=${dia.value}`)).data;
+    const respuesta = await run(signal =>
+      miApi.get(`agenda/huecos?dia=${dia.value}`, { signal })
+    );
+    if (respuesta) huecos.value = respuesta.data;
   } catch {
-    huecos.value = [];
-  } finally {
-    buscandoHuecos.value = false;
+    falloHuecos.value = true;
   }
 };
 
@@ -125,13 +143,15 @@ watch(dia, buscarHuecos);
 const abrir = () => {
   conversacionId.value = '';
   propiedadId.value = '';
+  const mismoDia = dia.value === hoy();
   dia.value = hoy();
   dialogRef.value?.open();
   cargar();
-  buscarHuecos();
+  if (mismoDia) buscarHuecos();
 };
 
 const guardar = async () => {
+  if (guardando.value || incompleto.value) return;
   guardando.value = true;
 
   try {
@@ -162,7 +182,7 @@ defineExpose({ abrir });
 </script>
 
 <template>
-  <Dialog
+  <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.AGENDA.NUEVA.TITULO')"
     :description="t('PORTELIA.AGENDA.NUEVA.DESCRIPCION')"
@@ -171,10 +191,23 @@ defineExpose({ abrir });
     :is-loading="guardando"
     overflow-y-auto
     @confirm="guardar"
+    @close="
+      abort();
+      abortDatos();
+    "
   >
     <div v-if="cargando" class="flex justify-center py-4">
       <Spinner />
     </div>
+    <Banner
+      v-else-if="fallo"
+      color="ruby"
+      role="alert"
+      :action-label="t('PORTELIA.REINTENTAR')"
+      @action="cargar"
+    >
+      {{ t('PORTELIA.AGENDA.ERROR_CARGA') }}
+    </Banner>
     <div v-else class="flex flex-col gap-4">
       <label
         v-if="!desdeElHilo"
@@ -212,6 +245,14 @@ defineExpose({ abrir });
         <div v-if="buscandoHuecos" class="flex py-2">
           <Spinner />
         </div>
+        <Banner
+          v-else-if="falloHuecos"
+          color="ruby"
+          role="alert"
+          :action-label="t('PORTELIA.REINTENTAR')"
+          @action="buscarHuecos"
+          >{{ t('PORTELIA.AGENDA.NUEVA.ERROR_HUECOS') }}</Banner
+        >
         <Select
           v-else-if="opcionesHueco.length"
           v-model="at"
@@ -224,5 +265,5 @@ defineExpose({ abrir });
         </span>
       </label>
     </div>
-  </Dialog>
+  </DialogoAsesor>
 </template>

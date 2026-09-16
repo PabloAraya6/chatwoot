@@ -12,6 +12,7 @@ import miApi from '../../api/miApi';
 import { CAMPOS_BUSQUEDA } from './camposBusqueda';
 import { fechaCorta, nombrePropiedad, precio } from './formato';
 import CampoBusqueda from './CampoBusqueda.vue';
+import HistorialBusqueda from './HistorialBusqueda.vue';
 import NuevaReaccion from './NuevaReaccion.vue';
 import NuevaOperacion from './NuevaOperacion.vue';
 import NuevaVisita from '../agenda/NuevaVisita.vue';
@@ -46,6 +47,10 @@ const reacciones = ref([]);
 const operaciones = ref([]);
 
 const propiedades = ref([]);
+
+const historialRef = ref(null);
+
+const guardandoCampo = ref(false);
 
 const nuevaReaccionRef = ref(null);
 
@@ -104,6 +109,8 @@ const cargar = async () => {
 };
 
 const editarCampo = async (busqueda, campo, valor) => {
+  if (guardandoCampo.value) throw new Error('request pending');
+  guardandoCampo.value = true;
   try {
     const { data } = await miApi.patch(`busquedas/${busqueda.id}`, {
       [campo]: valor,
@@ -111,8 +118,8 @@ const editarCampo = async (busqueda, campo, valor) => {
 
     busquedas.value = busquedas.value.map(b => (b.id === data.id ? data : b));
     useAlert(t('PORTELIA.FICHA.GUARDADO'));
-  } catch (error) {
-    useAlert(error?.response?.data?.error || t('PORTELIA.FICHA.ERROR_GUARDAR'));
+  } finally {
+    guardandoCampo.value = false;
   }
 };
 
@@ -142,7 +149,9 @@ watch(() => props.contactId, cargar, { immediate: true });
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 px-1 py-2 text-sm">
+  <div
+    class="flex flex-col min-w-0 gap-6 px-1 py-2 text-sm [&_button]:min-h-11 [&_button]:min-w-11 motion-reduce:[&_*]:!transition-none"
+  >
     <div v-if="cargando" class="flex justify-center py-6 text-n-slate-11">
       <Spinner />
     </div>
@@ -173,7 +182,16 @@ watch(() => props.contactId, cargar, { immediate: true });
             :key="definicion.campo"
             :busqueda="busqueda"
             :definicion="definicion"
-            @update="valor => editarCampo(busqueda, definicion.campo, valor)"
+            :disabled="guardandoCampo"
+            :guardar="valor => editarCampo(busqueda, definicion.campo, valor)"
+          />
+          <Button
+            variant="ghost"
+            color="slate"
+            icon="i-lucide-history"
+            :label="t('PORTELIA.FICHA.HISTORIAL.TITULO')"
+            class="self-start"
+            @click="historialRef.abrir(busqueda.id)"
           />
         </div>
       </section>
@@ -240,7 +258,7 @@ watch(() => props.contactId, cargar, { immediate: true });
             <span class="truncate text-n-slate-12">
               {{ propiedadDe(reaccion.propiedadId) }}
             </span>
-            <span v-if="reaccion.motivo" class="text-n-slate-11">
+            <span v-if="reaccion.motivo" class="text-n-slate-11 break-words">
               {{ reaccion.motivo }}
             </span>
             <Label
@@ -297,6 +315,7 @@ watch(() => props.contactId, cargar, { immediate: true });
         </div>
       </section>
 
+      <HistorialBusqueda ref="historialRef" />
       <NuevaVisita
         ref="nuevaVisitaRef"
         :contact-id="contactId"
