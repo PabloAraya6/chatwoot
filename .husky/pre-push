@@ -2,3 +2,6 @@
 . "$(dirname "$0")/_/husky.sh"
 
 sh bin/validate_push
+
+# Puertas propias del fork, acotadas a portelia/ (ver app/javascript/dashboard/portelia/README.md).
+pnpm run check

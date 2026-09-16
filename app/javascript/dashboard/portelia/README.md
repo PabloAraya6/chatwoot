@@ -61,3 +61,50 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
 Regla de nombres: ningún componente nuestro se llama como uno de upstream (`SidebarAsesor`, no
 `Sidebar`), las rutas van con prefijo `portelia_`, las claves i18n bajo `PORTELIA`, y los
 nombres del dominio en el castellano de `CONTEXT.md` del monorepo.
+
+## Puertas de calidad
+
+Todas acotadas a esta carpeta; upstream no se gatea (ver `PORTELIA.md` > Rebase). Corren todas
+con `pnpm run check`, colgado del hook `pre-push`.
+
+- **Marcadores** (`scripts/sin-marcadores.sh`, `pnpm run portelia:marcadores`): un `git grep`
+  que bloquea `TODO`/`FIXME` (van al tracker) y `ponytail:` (se resuelve o se declara en la
+  respuesta del PR) dentro de esta carpeta.
+- **ESLint**: `.eslintrc.js` en la raíz tiene un bloque `overrides` acotado a
+  `app/javascript/dashboard/portelia/**/*.vue` con `eslint-plugin-vuejs-accessibility`
+  (recomendado) y dos reglas de `eslint-plugin-vue` más estrictas que el resto del fork
+  (`no-setup-props-reactivity-loss`, `no-ref-object-reactivity-loss`). Corre con `pnpm eslint`
+  de siempre, ya que ESLint aplica el override según el glob del archivo. Dos reglas del preset
+  de accesibilidad quedan apagadas para esta carpeta:
+  - `label-has-for` y `form-control-has-label` sólo miran el sitio de la llamada, no el
+    template del componente hijo. `Input`/`TextArea` ya asocian `<label :for>` con `:id`
+    puertas adentro, y `Select` expone `:aria-label`; la regla no puede verlo y marca cada uso
+    en falso. Además el componente `Label` de Chatwoot (una badge de estado, no un form label)
+    choca con `label-has-for`: la regla matchea el nombre `label` sin ninguna opción para
+    excluirlo. No hay combinación de `components`/`controlComponents` que resuelva esto.
+  - `anchor-has-content` sí sigue activa, con `accessibleChildren: ['Button']`: el `Button` de
+    Chatwoot siempre resuelve a texto visible o a `:aria-label` si es sólo ícono.
+- **`vue-mess-detector`** (`pnpm run portelia:mess`): reporte de salud con un set curado —
+  el set por defecto menos `amountOfComments` (pelea con los comentarios deliberados del
+  capitán), `elseCondition` (dogma sin beneficio) y `singleNameComponent` (ver "Regla de
+  nombres de componentes" abajo). Gatea de verdad con `--healthError 96`: el 96% medido el
+  2026-09-16 es el piso (ratchet), no un objetivo aspiracional; si el health baja de ahí el
+  comando sale con código 1. Al agregar código nuevo, si el piso ya no representa el peor
+  valor real, subilo — nunca lo bajes para que pase un PR.
+  - Dos hallazgos de esta herramienta resultaron ser falsos positivos y quedan así a
+    propósito: los dos `<a target="_blank">` de `FichaPropiedad.vue` (regla `htmlLink`) son
+    links externos (recorrido virtual, aviso en otro sitio); `router-link` es para rutas
+    internas de este router y no aplica. Los `computed` marcados por `computedSideEffects`
+    (la regla dispara con cualquier `if` o `const` local dentro de un `computed`, no sólo con
+    una mutación real) se revisaron uno por uno: ninguno muta estado externo, todos derivan y
+    devuelven un valor.
+- **Gate de métricas** (`@pabloaraya6/eslint-config/metrics`, el ratchet anti-regresión de
+  `veratio-ai`): evaluado y descartado para este fork. Dos bloqueos independientes, cualquiera
+  alcanza: (1) el paquete se publica en un registro de GitHub Packages privado bajo un token
+  personal, no en el npm público — nadie más podría instalarlo sin ese token; (2) `metrics.mjs`
+  fija el parser en `@typescript-eslint/parser` sin forma de cambiarlo por opciones, así que no
+  puede leer `.vue` ni evaluar JS sin anotaciones de tipos. Ninguno de los dos se resuelve sin
+  tocar el paquete publicado. Queda afuera.
+
+Por qué `vue-mess-detector` no exige nombres de dos palabras: ver PORTELIA.md > "Regla de
+nombres".
