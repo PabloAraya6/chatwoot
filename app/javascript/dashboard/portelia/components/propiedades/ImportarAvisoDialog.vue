@@ -65,7 +65,6 @@ defineExpose({ abrir });
         type="url"
         inputmode="url"
         autocomplete="url"
-        autofocus
         :label="t('PORTELIA.PROPIEDADES.IMPORTAR.URL')"
         :placeholder="t('PORTELIA.PROPIEDADES.IMPORTAR.PLACEHOLDER')"
         :message="error"
