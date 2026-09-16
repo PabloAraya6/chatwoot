@@ -224,7 +224,7 @@ watch(() => props.propiedadId, cargar, { immediate: true });
           <Breadcrumb :items="migas" @click="cancelar" />
         </div>
       </header>
-      <main class="flex-1 min-h-0 px-4 sm:px-6 pb-6 overflow-y-auto">
+      <main class="flex-1 min-h-0 px-4 sm:px-6 overflow-y-auto">
         <div v-if="cargando" class="flex justify-center py-20">
           <Spinner />
         </div>
@@ -333,21 +333,21 @@ watch(() => props.propiedadId, cargar, { immediate: true });
             <Input
               v-model="campos.ambientes"
               type="number"
-              inputmode="decimal"
+              inputmode="numeric"
               min="1"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.AMBIENTES')"
             />
             <Input
               v-model="campos.dormitorios"
               type="number"
-              inputmode="decimal"
+              inputmode="numeric"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.DORMITORIOS')"
             />
             <Input
               v-model="campos.banos"
               type="number"
-              inputmode="decimal"
+              inputmode="numeric"
               min="0"
               :label="t('PORTELIA.PROPIEDADES.FORMULARIO.BANOS')"
             />
