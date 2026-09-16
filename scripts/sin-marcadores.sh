@@ -5,8 +5,10 @@
 # (.js/.vue/.json), no Markdown: la documentación necesita poder nombrar los marcadores.
 # Es un grep y no la regla `no-warning-comments` de ESLint porque esa regla no distingue
 # mayúsculas y en castellano "todo" aparece en cualquier comentario.
+# `\b` no es portable en el ERE de `git grep` (POSIX no lo define y el motor por defecto no lo
+# implementa: nunca matchea, el script salía 0 siempre). El borde de palabra se arma a mano.
 cd "$(dirname "$0")/.." || exit 1
-if git grep -nIE -e '\b(TODO|FIXME)\b' -e 'ponytail:' -- \
+if git grep -nIE -e '(^|[^A-Za-z])(TODO|FIXME)([^A-Za-z]|$)' -e 'ponytail:' -- \
   'app/javascript/dashboard/portelia/*.js' \
   'app/javascript/dashboard/portelia/**/*.js' \
   'app/javascript/dashboard/portelia/**/*.vue' \

@@ -69,7 +69,11 @@ con `pnpm run check`, colgado del hook `pre-push`.
 
 - **Marcadores** (`scripts/sin-marcadores.sh`, `pnpm run portelia:marcadores`): un `git grep`
   que bloquea `TODO`/`FIXME` (van al tracker) y `ponytail:` (se resuelve o se declara en la
-  respuesta del PR) dentro de esta carpeta.
+  respuesta del PR) dentro de esta carpeta. El patrón de borde de palabra se arma a mano
+  (`(^|[^A-Za-z])(TODO|FIXME)([^A-Za-z]|$)`) porque `\b` no es portable en el ERE de `git
+  grep`: POSIX no lo define y el motor por defecto no lo implementa, así que un patrón con
+  `\b` nunca matchea nada. No es hipotético: la versión original de `portelia` (de donde se
+  migró este script) tiene el mismo bug y nunca atrapó un marcador.
 - **ESLint**: `.eslintrc.js` en la raíz tiene un bloque `overrides` acotado a
   `app/javascript/dashboard/portelia/**/*.vue` con `eslint-plugin-vuejs-accessibility`
   (recomendado) y dos reglas de `eslint-plugin-vue` más estrictas que el resto del fork
@@ -84,20 +88,26 @@ con `pnpm run check`, colgado del hook `pre-push`.
     excluirlo. No hay combinación de `components`/`controlComponents` que resuelva esto.
   - `anchor-has-content` sí sigue activa, con `accessibleChildren: ['Button']`: el `Button` de
     Chatwoot siempre resuelve a texto visible o a `:aria-label` si es sólo ícono.
-- **`vue-mess-detector`** (`pnpm run portelia:mess`): reporte de salud con un set curado —
-  el set por defecto menos `amountOfComments` (pelea con los comentarios deliberados del
+- **`vue-mess-detector`** (`scripts/vmd-gate.js`, `pnpm run portelia:mess`): set curado — el
+  set por defecto menos `amountOfComments` (pelea con los comentarios deliberados del
   capitán), `elseCondition` (dogma sin beneficio) y `singleNameComponent` (ver "Regla de
-  nombres de componentes" abajo). Gatea de verdad con `--healthError 96`: el 96% medido el
-  2026-09-16 es el piso (ratchet), no un objetivo aspiracional; si el health baja de ahí el
-  comando sale con código 1. Al agregar código nuevo, si el piso ya no representa el peor
-  valor real, subilo — nunca lo bajes para que pase un PR.
+  nombres de componentes" abajo). El `--healthError` del CLI (el % de salud redondeado) se
+  probó primero y resultó demasiado grueso para ser un ratchet: metiendo ocho `:key` por
+  índice nuevos, la salud siguió en 96% y el comando salió 0 (encontrado en la revisión de PR
+  #12). `vmd-gate.js` reemplaza eso: corre el detector con `--output json`, limpia los códigos
+  ANSI que trae la salida (si no, no es JSON válido) y compara ocurrencias por regla contra el
+  peor valor medido el 2026-09-16 — `totalErrors` (55), y ceros estrictos en
+  `VFor With Index Key` y `Zero Length Comparison`, los dos bugs reales que este PR arregló.
+  Subí los pisos si el código crece de forma legítima; nunca los bajes para que pase un PR.
   - Dos hallazgos de esta herramienta resultaron ser falsos positivos y quedan así a
     propósito: los dos `<a target="_blank">` de `FichaPropiedad.vue` (regla `htmlLink`) son
     links externos (recorrido virtual, aviso en otro sitio); `router-link` es para rutas
-    internas de este router y no aplica. Los `computed` marcados por `computedSideEffects`
-    (la regla dispara con cualquier `if` o `const` local dentro de un `computed`, no sólo con
-    una mutación real) se revisaron uno por uno: ninguno muta estado externo, todos derivan y
-    devuelven un valor.
+    internas de este router y no aplica. `vmd-gate.js` ratchea `htmlLink` en su valor actual
+    (1) en vez de en cero, así que un `<a>` nuevo sin revisar sí frena. Los `computed`
+    marcados por `computedSideEffects` (la regla dispara con cualquier `if` o `const` local
+    dentro de un `computed`, no sólo con una mutación real) se revisaron uno por uno: ninguno
+    muta estado externo, todos derivan y devuelven un valor; ese conteo entra en el piso
+    genérico de `totalErrors`, no tiene su propio ratchet.
 - **Gate de métricas** (`@pabloaraya6/eslint-config/metrics`, el ratchet anti-regresión de
   `veratio-ai`): evaluado y descartado para este fork. Dos bloqueos independientes, cualquiera
   alcanza: (1) el paquete se publica en un registro de GitHub Packages privado bajo un token
