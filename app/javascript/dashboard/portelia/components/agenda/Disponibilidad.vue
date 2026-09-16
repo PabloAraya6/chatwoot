@@ -146,8 +146,8 @@ defineExpose({ abrir });
           {{ t('PORTELIA.AGENDA.FRANJAS.SIN_FRANJA') }}
         </p>
         <div
-          v-for="(franja, indice) in dia.franjas"
-          :key="indice"
+          v-for="franja in dia.franjas"
+          :key="franja"
           class="flex items-center gap-2"
         >
           <Input
