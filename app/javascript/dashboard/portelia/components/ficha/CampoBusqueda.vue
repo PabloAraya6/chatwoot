@@ -126,6 +126,7 @@ const confirmar = async () => {
       >
       <span class="i-lucide-pencil size-4 shrink-0" aria-hidden="true" />
     </Button>
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- @keydown.esc es un atajo de teclado adicional, no un reemplazo de la navegación nativa del form. -->
     <form
       v-else
       ref="formRef"
@@ -147,7 +148,6 @@ const confirmar = async () => {
         v-model="borrador"
         :label="etiqueta"
         :disabled="guardando"
-        autofocus
         class="[&_textarea]:text-base"
       />
       <Input
@@ -157,7 +157,6 @@ const confirmar = async () => {
         :inputmode="definicion.tipo === 'number' ? 'numeric' : 'text'"
         :label="etiqueta"
         :disabled="guardando"
-        autofocus
         custom-input-class="min-h-11 !text-base"
       />
       <p v-if="error" role="alert" class="m-0 text-sm text-n-ruby-11">

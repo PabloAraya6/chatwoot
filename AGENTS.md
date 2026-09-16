@@ -128,3 +128,15 @@ Practical checklist for any change impacting core logic or public APIs
 ## Branding / White-labeling note
 
 - For user-facing strings that currently contain "Chatwoot" but should adapt to branded/self-hosted installs, prefer applying `replaceInstallationName` from `shared/composables/useBranding` in the UI layer (for example tooltip and suggestion labels) instead of adding hardcoded brand-specific copy.
+
+## Portelia fork
+
+- The Portelia advisor UI lives under `app/javascript/dashboard/portelia/` behind the `portelia_ui` account flag. See `PORTELIA.md` (root) for the upstream touch points and `app/javascript/dashboard/portelia/README.md` for the folder's shape and its own quality gates (`pnpm run check`, hung off `pre-push`).
+- Any new lint/analysis tool must stay scoped to `portelia/**`; upstream is never gated (see `PORTELIA.md` > Rebase for why). Before adding a tool, check `portelia/README.md` > "Puertas de calidad" for ones already evaluated and rejected, with the reason.
+
+## Maintaining this file
+
+Keep this file for knowledge useful to almost every future agent session in this project.
+Do not repeat what the codebase already shows; point to the authoritative file or command instead.
+Prefer rewriting or pruning existing entries over appending new ones.
+When updating this file, preserve this bar for all agents and keep entries concise.

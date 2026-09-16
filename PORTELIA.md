@@ -30,15 +30,20 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `app/javascript/dashboard/composables/useUISettings.js` | Suma `portelia_ficha` a `DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER`, arriba de todo. |
 | `app/javascript/dashboard/routes/dashboard/conversation/ContactPanel.vue` | Con el flag, `FichaPersona` como sección `portelia_ficha` del acordeón del panel (import, `hasPorteliaUi`, un `v-if` en el `#item`). |
 | `app/javascript/dashboard/routes/dashboard/contacts/pages/ContactManageView.vue` | Con el flag, `FichaPersona` arriba de los datos del contacto en la página Personas (import, `hasPorteliaUi`, un `v-if`). |
+| `.eslintrc.js` | Un bloque `overrides` acotado a `app/javascript/dashboard/portelia/**/*.vue`: accesibilidad (`eslint-plugin-vuejs-accessibility`) y dos reglas de `eslint-plugin-vue` más estrictas. Detalle y reglas apagadas en `portelia/README.md` > "Puertas de calidad". |
+| `.husky/pre-push` | Suma `pnpm run check` (marcadores, `vue-mess-detector`, ESLint, tests) después de `bin/validate_push`. |
 
 Archivos nuevos fuera de `portelia/`: `PORTELIA.md`, `bin/portelia-dev`,
 `docker-compose.portelia.yaml`, `Caddyfile.taller`, `public/android-icon-512x512.png`,
-`public/maskable-icon-512x512.png`.
+`public/maskable-icon-512x512.png`, `scripts/sin-marcadores.sh`.
 
 ## Regla de nombres
 
 - Un componente nuestro nunca se llama como uno de upstream: `SidebarAsesor`, no `Sidebar`.
 - Rutas con prefijo `portelia_`; claves i18n bajo `PORTELIA.*`, sólo en `es`.
+- No aplicamos la regla de Vue de nombres de dos palabras. Existe para no chocar con etiquetas
+  HTML; nuestros nombres son del dominio y en castellano, así que ese choque no puede darse.
+  Agenda, Disponibilidad y Configuracion quedan.
 - Nombres del dominio en el castellano de `CONTEXT.md` del monorepo (Persona, Propiedad,
   Búsqueda, Visita, Operación).
 
@@ -94,6 +99,10 @@ regenera y `apply_theme.rb` lo inyecta.
 `pnpm install` en la Mac (Node 24, pnpm 10) y `pnpm eslint`; los tests de Vue con `pnpm test`.
 Los specs de Ruby corren en el contenedor:
 `bin/portelia-dev exec rails-taller bundle exec rspec spec/lib/config_loader_spec.rb`.
+
+`pnpm run check` corre las puertas propias de `portelia/` (marcadores, `vue-mess-detector`,
+ESLint, tests) y cuelga del hook `pre-push`; el detalle de cada una está en
+`portelia/README.md` > "Puertas de calidad".
 
 ## Rebase
 

@@ -47,7 +47,6 @@ defineExpose({ abrir, cerrar });
       v-model="motivo"
       :label="t('PORTELIA.AGENDA.CANCELAR.MOTIVO')"
       :placeholder="t('PORTELIA.AGENDA.CANCELAR.MOTIVO_EJEMPLO')"
-      autofocus
     />
   </DialogoAsesor>
 </template>

@@ -28,6 +28,36 @@ module.exports = {
         'no-console': 'off',
       },
     },
+    // Puertas propias del fork, acotadas a portelia/: ver PORTELIA.md > "Puertas de calidad".
+    // Upstream no se gatea (más de 9k archivos ajenos, 453 avisos preexistentes).
+    {
+      files: ['app/javascript/dashboard/portelia/**/*.vue'],
+      extends: ['plugin:vuejs-accessibility/recommended'],
+      // El preset de accesibilidad fija ecmaVersion 2020; lo reponemos porque el fork usa
+      // separadores numéricos (86_400_000) y otra sintaxis de ES2021+.
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      rules: {
+        'vue/no-setup-props-reactivity-loss': 'error',
+        'vue/no-ref-object-reactivity-loss': 'error',
+        // El diseño de estos componentes ya asocia el control con su label puertas adentro
+        // (Input/TextArea renderizan <label :for> + :id internos; Select expone :aria-label).
+        // Las dos reglas sólo miran el sitio de la llamada, no el template del hijo, así que
+        // marcan en falso cada uso de esos componentes. El componente propio de Chatwoot
+        // `Label` (badge de estado, no un form label) además choca con `label-has-for`: la
+        // regla matchea el nombre "label" sin forma de excluirlo por config.
+        'vuejs-accessibility/label-has-for': 'off',
+        'vuejs-accessibility/form-control-has-label': 'off',
+        // `Button` siempre resuelve a texto visible (o :aria-label si es sólo ícono); evita
+        // duplicar aria-label en cada <a> que lo envuelve.
+        'vuejs-accessibility/anchor-has-content': [
+          'error',
+          { accessibleChildren: ['Button'] },
+        ],
+      },
+    },
   ],
   plugins: ['html', 'prettier'],
   parserOptions: {

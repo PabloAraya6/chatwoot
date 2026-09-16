@@ -104,7 +104,7 @@ const dias = computed(() =>
 const hoyDia = computed(() => dias.value[0]);
 
 const semana = computed(() =>
-  dias.value.slice(1).filter(dia => dia.visitas.length > 0)
+  dias.value.slice(1).filter(dia => dia.visitas.length)
 );
 
 const reemplazar = visita => {
