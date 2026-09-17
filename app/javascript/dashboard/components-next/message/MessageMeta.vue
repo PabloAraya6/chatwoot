@@ -7,6 +7,8 @@ import Icon from 'next/icon/Icon.vue';
 import { useInbox } from 'dashboard/composables/useInbox';
 import { useMessageContext } from './provider.js';
 
+import { useHiloMobile } from 'dashboard/portelia/composables/useHiloMobile';
+
 import { MESSAGE_STATUS, MESSAGE_TYPES } from './constants';
 
 const {
@@ -31,6 +33,9 @@ const {
   messageType,
   contentAttributes,
 } = useMessageContext();
+
+const hiloMobile = useHiloMobile();
+const compactTime = computed(() => messageTimestamp(createdAt.value, 'HH:mm'));
 
 const readableTime = computed(() =>
   messageTimestamp(createdAt.value, 'LLL d, h:mm a')
@@ -134,7 +139,9 @@ const statusToShow = computed(() => {
 <template>
   <div class="text-xs flex items-center gap-1.5">
     <div class="inline">
-      <time class="inline">{{ readableTime }}</time>
+      <time class="inline" :title="readableTime">{{
+        hiloMobile ? compactTime : readableTime
+      }}</time>
     </div>
     <Icon v-if="isPrivate" icon="i-lucide-lock-keyhole" class="size-3" />
     <MessageStatus v-if="showStatusIndicator" :status="statusToShow" />

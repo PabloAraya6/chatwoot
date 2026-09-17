@@ -140,9 +140,9 @@ const buscarHuecos = async () => {
 
 watch(dia, buscarHuecos);
 
-const abrir = () => {
+const abrir = (propiedadInicial = '') => {
   conversacionId.value = '';
-  propiedadId.value = '';
+  propiedadId.value = propiedadInicial;
   const mismoDia = dia.value === hoy();
   dia.value = hoy();
   dialogRef.value?.open();

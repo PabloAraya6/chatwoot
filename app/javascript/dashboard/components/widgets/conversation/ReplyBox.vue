@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, useTemplateRef } from 'vue';
+import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { mapGetters } from 'vuex';
 import { useAlert } from 'dashboard/composables';
 import { useUISettings } from 'dashboard/composables/useUISettings';
@@ -7,6 +7,8 @@ import { useTrack } from 'dashboard/composables';
 import keyboardEventListenerMixins from 'shared/mixins/keyboardEventListenerMixins';
 
 import ReplyToMessage from './ReplyToMessage.vue';
+import NextButton from 'dashboard/components-next/button/Button.vue';
+import { COMPOSER_MOBILE } from 'dashboard/portelia/clasesAsesor';
 import AttachmentPreview from 'dashboard/components/widgets/AttachmentsPreview.vue';
 import ReplyTopPanel from 'dashboard/components/widgets/WootWriter/ReplyTopPanel.vue';
 import ReplyEmailHead from './ReplyEmailHead.vue';
@@ -55,6 +57,8 @@ import { useCopilotReply } from 'dashboard/composables/useCopilotReply';
 import { useMacroExecution } from 'dashboard/composables/useMacroExecution';
 import ConversationResolveAttributesModal from 'dashboard/components-next/ConversationWorkflow/ConversationResolveAttributesModal.vue';
 import { useKbd } from 'dashboard/composables/utils/useKbd';
+import { useAlturaRespuesta } from 'dashboard/portelia/composables/useAlturaRespuesta';
+import { useHiloMobile } from 'dashboard/portelia/composables/useHiloMobile';
 import { isFileTypeAllowedForChannel } from 'shared/helpers/FileHelper';
 
 import { LOCAL_STORAGE_KEYS } from 'dashboard/constants/localStorage';
@@ -68,6 +72,7 @@ const EmojiIconPicker = defineAsyncComponent(
 
 export default {
   components: {
+    NextButton,
     ArticleSearchPopover,
     AttachmentPreview,
     AudioRecorder,
@@ -101,9 +106,16 @@ export default {
     const messageEditor = useTemplateRef('messageEditor');
     const copilot = useCopilotReply();
     const macroExecution = useMacroExecution();
+    const hiloMobile = useHiloMobile();
+    useAlturaRespuesta(
+      replyEditor,
+      computed(() => hiloMobile.value && !copilot.isActive.value)
+    );
     const shortcutKey = useKbd(['$mod', '+', 'enter']);
 
     return {
+      hiloMobile,
+      COMPOSER_MOBILE,
       uiSettings,
       isEditorHotKeyEnabled,
       fetchSignatureFlagFromUISettings,
@@ -121,6 +133,7 @@ export default {
       message: '',
       inReplyTo: {},
       isFocused: false,
+      herramientasAbiertas: false,
       showEmojiPicker: false,
       attachedFiles: [],
       isRecordingAudio: false,
@@ -264,8 +277,16 @@ export default {
         return this.$t('CONVERSATION.FOOTER.MESSAGING_RESTRICTED');
       }
       return this.isPrivate
-        ? this.$t('CONVERSATION.FOOTER.PRIVATE_MSG_INPUT')
-        : this.$t('CONVERSATION.FOOTER.MSG_INPUT');
+        ? this.$t(
+            this.hiloMobile
+              ? 'CONVERSATION.REPLYBOX.PRIVATE_NOTE'
+              : 'CONVERSATION.FOOTER.PRIVATE_MSG_INPUT'
+          )
+        : this.$t(
+            this.hiloMobile
+              ? 'PORTELIA.HILO.RESPONDER'
+              : 'CONVERSATION.FOOTER.MSG_INPUT'
+          );
     },
     isMessageLengthReachingThreshold() {
       return this.message.length > this.maxLength - 50;
@@ -354,6 +375,7 @@ export default {
       if (this.isPrivate) {
         sendMessageText = this.$t('CONVERSATION.REPLYBOX.CREATE');
       }
+      if (this.hiloMobile) return sendMessageText;
       const keyLabel = this.isEditorHotKeyEnabled('cmd_enter')
         ? `(${this.shortcutKey})`
         : '(↵)';
@@ -535,6 +557,7 @@ export default {
     },
     conversationIdByRoute(conversationId, oldConversationId) {
       if (conversationId !== oldConversationId) {
+        this.herramientasAbiertas = false;
         this.switchDraftContext(conversationId, this.effectiveReplyMode);
         this.resetRecorderAndClearAttachments();
       }
@@ -1338,8 +1361,45 @@ export default {
 
 <template>
   <ReplyBoxBanner :message="message" :is-on-private-note="isOnPrivateNote" />
-  <div ref="replyEditor" class="reply-box" :class="replyBoxClass">
+  <div
+    ref="replyEditor"
+    class="reply-box"
+    :class="[replyBoxClass, hiloMobile && COMPOSER_MOBILE]"
+  >
+    <NextButton
+      v-if="hiloMobile"
+      :aria-label="
+        $t(
+          herramientasAbiertas
+            ? 'PORTELIA.HILO.CERRAR_HERRAMIENTAS'
+            : 'PORTELIA.HILO.HERRAMIENTAS'
+        )
+      "
+      :aria-expanded="herramientasAbiertas"
+      :aria-controls="`herramientas-${conversationId}`"
+      :icon="herramientasAbiertas ? 'i-lucide-x' : 'i-lucide-plus'"
+      variant="ghost"
+      color="slate"
+      class="col-start-1 row-start-1 self-end"
+      @click="herramientasAbiertas = !herramientasAbiertas"
+    />
+    <NextButton
+      v-if="hiloMobile && !copilot.isActive.value"
+      :aria-label="replyButtonLabel"
+      icon="i-lucide-arrow-up"
+      :color="isPrivate ? 'amber' : 'blue'"
+      :disabled="isReplyButtonDisabled"
+      class="col-start-3 row-start-1 self-end !rounded-full"
+      @click="onSendReply"
+    />
     <ReplyTopPanel
+      v-show="
+        !hiloMobile ||
+        herramientasAbiertas ||
+        isPrivate ||
+        isMessageLengthReachingThreshold
+      "
+      :class="{ 'col-span-3 row-start-2': hiloMobile }"
       :mode="replyType"
       :conversation-id="conversationId"
       :is-reply-restricted="!canSendPublicReply"
@@ -1372,7 +1432,11 @@ export default {
       leave-from-class="opacity-100 translate-y-0 scale-100"
       leave-to-class="opacity-0 translate-y-2 scale-[0.98]"
     >
-      <div :key="copilot.editorTransitionKey.value" class="reply-box__top">
+      <div
+        :key="copilot.editorTransitionKey.value"
+        class="reply-box__top"
+        :class="{ 'col-start-2 row-start-1 min-w-0 !px-1 !mt-0': hiloMobile }"
+      >
         <ReplyToMessage
           v-if="shouldShowReplyToMessage"
           :message="inReplyTo"
@@ -1428,6 +1492,7 @@ export default {
           :placeholder="messagePlaceHolder"
           :update-selection-with="updateEditorSelectionWith"
           :min-height="4"
+          :focus-on-mount="!hiloMobile"
           :disabled="isEditorDisabled"
           :enable-macros="isMacrosEnabled"
           enable-variables
@@ -1491,13 +1556,20 @@ export default {
       <CopilotReplyBottomPanel
         v-if="copilot.isActive.value"
         key="copilot-bottom-panel"
+        :class="{ 'col-span-3 row-start-3': hiloMobile }"
         :is-generating-content="copilot.isButtonDisabled.value"
         @submit="onSubmitCopilotReply"
         @cancel="copilot.reset"
       />
       <ReplyBottomPanel
         v-else
+        v-show="!hiloMobile || herramientasAbiertas || isRecordingAudio"
+        :id="`herramientas-${conversationId}`"
         key="reply-bottom-panel"
+        :class="{
+          'col-span-3 row-start-3 [&>.right-wrap]:!hidden [&_.left-wrap]:flex-wrap [&_button]:!bg-transparent':
+            hiloMobile,
+        }"
         :conversation-id="conversationId"
         :enable-multiple-file-upload="enableMultipleFileUpload"
         :enable-whats-app-templates="showWhatsappTemplates"

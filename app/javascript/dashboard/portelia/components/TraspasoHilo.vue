@@ -9,6 +9,7 @@ import ConversationApi from 'dashboard/api/inbox/conversation';
 import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import miApi from '../api/miApi';
+import ResumenHilo from './hilo/ResumenHilo.vue';
 
 // Arriba del hilo: de quién es la conversación y, si la secretaria la pasó, su nota de
 // traspaso (content_attributes.traspaso de la nota privada que deja al asignar). Si un humano
@@ -27,7 +28,9 @@ const currentUserId = useMapGetter('getCurrentUserID');
 const asignado = computed(() => props.chat.meta?.assignee);
 
 const estado = computed(() => {
-  if (!asignado.value) return 'guardia';
+  if (!asignado.value) {
+    return 'guardia';
+  }
 
   return asignado.value.id === currentUserId.value ? 'mio' : 'otro';
 });
@@ -43,7 +46,9 @@ const traspaso = computed(
 const tomando = ref(false);
 
 const tomar = async () => {
-  if (tomando.value) return;
+  if (tomando.value) {
+    return;
+  }
   tomando.value = true;
   const conversationId = props.chat.id;
 
@@ -81,7 +86,9 @@ const leerSecretaria = async () => {
     const respuesta = await run(signal =>
       miApi.get(`conversaciones/${props.chat.id}/secretaria`, { signal })
     );
-    if (respuesta) secretaria.value = respuesta.data;
+    if (respuesta) {
+      secretaria.value = respuesta.data;
+    }
   } catch {
     estadoFallido.value = true;
   }
@@ -96,7 +103,9 @@ const calla = computed(
 );
 
 const devolver = async () => {
-  if (devolviendo.value) return;
+  if (devolviendo.value) {
+    return;
+  }
   devolviendo.value = true;
 
   try {
@@ -112,12 +121,12 @@ const devolver = async () => {
 </script>
 
 <template>
-  <!-- En el celular el botón flotante del panel del contacto se superpone al borde derecho. -->
   <div
-    class="flex flex-col gap-1.5 border-b border-n-weak bg-n-solid-1 px-3 py-2 text-sm max-md:pe-20 break-words min-w-0"
+    class="flex shrink-0 flex-col border-b border-n-weak bg-n-solid-1 text-sm break-words min-w-0 [&_button]:min-h-11 [&_button]:min-w-11"
   >
     <div
-      class="flex flex-wrap items-center justify-between gap-2 [&_button]:min-h-11 [&_button]:min-w-11"
+      :class="{ 'hidden md:flex': estado !== 'guardia' }"
+      class="flex min-h-9 flex-wrap items-center justify-between gap-x-2 px-4"
     >
       <span
         class="flex min-w-0 items-center gap-1.5 font-medium text-n-slate-12"
@@ -159,43 +168,30 @@ const devolver = async () => {
     >
       {{ t('PORTELIA.HILO.ESTADO_ERROR') }}
     </Banner>
-    <div v-if="calla" class="flex flex-wrap items-center justify-between gap-2">
-      <span class="flex items-center gap-1.5 text-n-slate-11">
+    <details v-if="calla" class="px-3 text-n-slate-11">
+      <summary class="flex min-h-11 cursor-pointer items-center gap-2">
         <span class="i-lucide-bot-off size-4 shrink-0" />
         {{ t('PORTELIA.HILO.CALLA') }}
-      </span>
+      </summary>
       <Button
         :label="t('PORTELIA.HILO.DEVOLVER')"
         icon="i-lucide-bot"
         size="sm"
         variant="faded"
         color="slate"
+        class="mb-2"
         :is-loading="devolviendo"
         :disabled="devolviendo"
         @click="devolver"
       />
-    </div>
-    <template v-if="traspaso">
-      <p class="text-n-slate-11">
-        <span class="font-medium text-n-slate-12">
-          {{ t('PORTELIA.HILO.TRASPASO') }}
-        </span>
-        {{ traspaso.resumen }}
-      </p>
-      <ul v-if="traspaso.propiedades?.length" class="m-0 flex flex-col gap-0.5">
-        <li
-          v-for="propiedad in traspaso.propiedades"
-          :key="propiedad.id"
-          class="flex items-baseline gap-1.5 text-n-slate-11"
-        >
-          <span class="i-lucide-house size-3.5 shrink-0 translate-y-0.5" />
-          <span>
-            {{
-              [propiedad.titulo, propiedad.motivo].filter(Boolean).join(' · ')
-            }}
-          </span>
-        </li>
-      </ul>
-    </template>
+    </details>
+    <ResumenHilo
+      :key="chat.id"
+      :chat="chat"
+      :traspaso="traspaso"
+      :puede-actuar="
+        estado === 'mio' && chat.status === 'open' && chat.can_reply !== false
+      "
+    />
   </div>
 </template>

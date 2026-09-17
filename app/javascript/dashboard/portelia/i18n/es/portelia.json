@@ -19,10 +19,39 @@
       "TOMAR_ERROR": "No se pudo tomar la conversación. Probá de nuevo.",
       "ESTADO_ERROR": "No se pudo consultar el estado de la secretaria.",
       "TRASPASO": "La secretaria te la pasa.",
-      "CALLA": "La secretaria calla en esta conversación.",
-      "DEVOLVER": "Devolvérsela",
+      "CALLA": "Secretaria en pausa",
+      "DEVOLVER": "Devolver a la secretaria",
+      "RESUMEN": "Búsqueda del cliente",
+      "SIN_RESUMEN": "Todavía no hay un resumen de la secretaria. Revisá los últimos mensajes.",
+      "OPCIONES": "Ver {n} propiedades",
+      "ENVIAR_FICHA": "Enviar ficha",
+      "ENVIAR_A": "Se enviará la ficha por WhatsApp a {nombre} en esta conversación.",
+      "PROPIEDAD_ERROR": "No pudimos verificar esta propiedad.",
+      "TOMAR_PARA_ACTUAR": "Para enviar fichas o agendar, la conversación debe estar abierta y a tu cargo.",
+      "NOTA_ORIGINAL": "Traspaso de secretaría",
+      "ACCIONES": "Acciones de la conversación",
+      "RESPONDER": "Escribí tu respuesta…",
+      "HASTA": "hasta {precio}",
+      "DORMITORIOS": "{n} dorm.",
+      "REINTENTAR_BUSQUEDA": "No se pudo cargar la búsqueda. Reintentar",
+      "PASO": {
+        "COORDINAR": "Quiere visitar. Revisá las visitas antes de agendar.",
+        "OFRECER": "Compartí una ficha o coordiná una visita.",
+        "AMPLIAR": "Sin coincidencias. Consultá otras zonas o presupuesto.",
+        "CONTINUAR": "Continuá la conversación con el cliente."
+      },
       "DEVUELTA": "La secretaria retoma la conversación; queda sin asignar.",
-      "DEVOLVER_ERROR": "No se pudo devolver la conversación."
+      "DEVOLVER_ERROR": "No se pudo devolver la conversación.",
+      "BUSCA": "Busca {tipo} {operacion}",
+      "OPERACION": {
+        "alquiler": "en alquiler",
+        "venta": "en venta",
+        "temporario": "temporario",
+        "proyecto": "en proyecto"
+      },
+      "HERRAMIENTAS": "Herramientas de respuesta",
+      "CERRAR_HERRAMIENTAS": "Cerrar herramientas",
+      "VER_MAS": "Ver todas ({n})"
     },
     "PUSH": {
       "AVISO": "Activá los avisos para recibir el traspaso en el celular con la Bandeja cerrada.",

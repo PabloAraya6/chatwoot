@@ -11,6 +11,8 @@ import Label from 'dashboard/components-next/label/Label.vue';
 import miApi from '../../api/miApi';
 import { CAMPOS_BUSQUEDA } from './camposBusqueda';
 import { fechaCorta, nombrePropiedad, precio } from './formato';
+import { emitter } from 'shared/helpers/mitt';
+import { BUSQUEDA_ACTUALIZADA } from './eventos';
 import CampoBusqueda from './CampoBusqueda.vue';
 import HistorialBusqueda from './HistorialBusqueda.vue';
 import NuevaReaccion from './NuevaReaccion.vue';
@@ -117,6 +119,7 @@ const editarCampo = async (busqueda, campo, valor) => {
     });
 
     busquedas.value = busquedas.value.map(b => (b.id === data.id ? data : b));
+    emitter.emit(BUSQUEDA_ACTUALIZADA, data);
     useAlert(t('PORTELIA.FICHA.GUARDADO'));
   } finally {
     guardandoCampo.value = false;

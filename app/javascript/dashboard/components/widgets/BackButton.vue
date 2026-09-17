@@ -1,5 +1,6 @@
 <script setup>
-import router from '../../routes/index';
+import { useRouter } from 'vue-router';
+
 const props = defineProps({
   backUrl: {
     type: [String, Object],
@@ -14,7 +15,7 @@ const props = defineProps({
     default: false,
   },
 });
-
+const router = useRouter();
 const goBack = () => {
   if (props.backUrl !== '') {
     router.push(props.backUrl);

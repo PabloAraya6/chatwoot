@@ -171,6 +171,7 @@ export default {
       <div class="relative">
         <NextButton
           ref="copilotToggleRef"
+          :aria-label="$t('CONVERSATION.SIDEBAR.COPILOT')"
           ghost
           :disabled="disabled || isEditorDisabled"
           :class="{
@@ -199,6 +200,7 @@ export default {
         class="text-n-slate-11"
         sm
         icon="i-lucide-maximize-2"
+        :aria-label="$t('CONVERSATION.REPLYBOX.TOGGLE_EDITOR_SIZE')"
         @click="$emit('toggleEditorSize')"
       />
     </div>

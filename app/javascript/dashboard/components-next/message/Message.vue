@@ -47,6 +47,8 @@ import WhatsappReferral from './bubbles/Text/WhatsappReferral.vue';
 import MessageError from './MessageError.vue';
 import ContextMenu from 'dashboard/modules/conversations/components/MessageContextMenu.vue';
 import { useBranding } from 'shared/composables/useBranding';
+import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
+import NotaTraspaso from 'dashboard/portelia/components/hilo/NotaTraspaso.vue';
 
 /**
  * @typedef {Object} Attachment
@@ -151,6 +153,7 @@ const inboxGetter = useMapGetter('inboxes/getInbox');
 const inbox = computed(() => inboxGetter.value(props.inboxId) || {});
 const isOnChatwootCloud = useMapGetter('globalConfig/isOnChatwootCloud');
 const { replaceInstallationName } = useBranding();
+const hasPorteliaUi = usePorteliaUi();
 
 const isCaptainMessage = computed(() => {
   const senderType = props.sender?.type ?? props.senderType;
@@ -559,7 +562,22 @@ provideMessageContext({
       },
     ]"
   >
-    <div v-if="variant === MESSAGE_VARIANTS.ACTIVITY">
+    <NotaTraspaso
+      v-if="
+        hasPorteliaUi &&
+        props.private &&
+        contentAttributes.traspaso &&
+        !isMessageDeleted
+      "
+      class="mx-auto"
+    />
+    <div
+      v-else-if="variant === MESSAGE_VARIANTS.ACTIVITY"
+      :class="{
+        '[&_[data-bubble-name=activity]]:!bg-transparent [&_[data-bubble-name=activity]]:!text-xs [&_[data-bubble-name=activity]]:text-center':
+          hasPorteliaUi,
+      }"
+    >
       <ActivityBubble :content="content" />
     </div>
     <div

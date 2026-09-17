@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { useElementSize } from '@vueuse/core';
@@ -16,6 +16,10 @@ import { useInbox } from 'dashboard/composables/useInbox';
 import { useAlert } from 'dashboard/composables';
 import { useI18n } from 'vue-i18n';
 import { copyTextToClipboard } from 'shared/helpers/clipboard';
+import { useHiloMobile } from 'dashboard/portelia/composables/useHiloMobile';
+import Button from 'dashboard/components-next/button/Button.vue';
+import { FEATURE_FLAGS } from 'dashboard/featureFlags';
+import { useUISettings } from 'dashboard/composables/useUISettings';
 
 const props = defineProps({
   chat: {
@@ -32,6 +36,28 @@ const { t } = useI18n();
 const store = useStore();
 const route = useRoute();
 const conversationHeader = ref(null);
+const hiloMobile = useHiloMobile();
+const { updateUISettings } = useUISettings();
+const ownership = computed(() => {
+  const assignee = props.chat.meta?.assignee;
+  if (!assignee) return t('PORTELIA.BANDEJA.GUARDIA');
+  return assignee.id === store.getters.getCurrentUserID
+    ? t('PORTELIA.HILO.MIO')
+    : t('PORTELIA.HILO.OTRO', { nombre: assignee.name });
+});
+const accionesAbiertas = ref(false);
+const showCopilot = computed(() =>
+  store.getters['accounts/isFeatureEnabledonAccount'](
+    store.getters.getCurrentAccountId,
+    FEATURE_FLAGS.CAPTAIN
+  )
+);
+watch(
+  () => props.chat.id,
+  () => {
+    accionesAbiertas.value = false;
+  }
+);
 const { width } = useElementSize(conversationHeader);
 const { isAWebWidgetInbox } = useInbox();
 
@@ -111,23 +137,74 @@ const copyConversationId = async () => {
   <div
     ref="conversationHeader"
     class="flex flex-col gap-3 items-center justify-between flex-1 w-full min-w-0 xl:flex-row px-3 pt-3 pb-2 h-24 xl:h-12"
+    :class="{
+      '!flex-row !flex-wrap !gap-1 !h-auto !flex-none !py-2': hiloMobile,
+    }"
   >
     <div
       class="flex items-center justify-start w-full xl:w-auto max-w-full min-w-0 xl:flex-1"
+      :class="{ '!w-auto flex-1': hiloMobile }"
     >
+      <Button
+        v-if="showBackButton && hiloMobile"
+        :aria-label="t('GENERAL_SETTINGS.BACK')"
+        icon="i-lucide-chevron-left"
+        variant="ghost"
+        color="slate"
+        @click="$router.push(backButtonUrl)"
+      />
       <BackButton
-        v-if="showBackButton"
+        v-else-if="showBackButton"
         :back-url="backButtonUrl"
         class="me-2"
       />
+      <button
+        v-if="hiloMobile"
+        type="button"
+        :aria-label="`${currentContact.name} · ${t('CONVERSATION.SIDEBAR.CONTACT')}`"
+        class="flex min-w-0 flex-1 items-center gap-2 text-start"
+        @click="
+          updateUISettings({
+            is_contact_sidebar_open: true,
+            is_copilot_panel_open: false,
+          })
+        "
+      >
+        <Avatar
+          :name="currentContact.name"
+          :src="currentContact.thumbnail"
+          :size="32"
+          hide-offline-status
+        />
+        <span class="min-w-0">
+          <span
+            class="block truncate text-base font-semibold leading-5 text-n-slate-12"
+            >{{ currentContact.name }}</span
+          >
+          <span class="block truncate text-xs leading-5 text-n-slate-11">{{
+            isSnoozed ? snoozedDisplayText : ownership
+          }}</span>
+        </span>
+        <fluent-icon
+          v-if="!isHMACVerified"
+          v-tooltip="t('CONVERSATION.UNVERIFIED_SESSION')"
+          size="14"
+          class="shrink-0 text-n-amber-10"
+          icon="warning"
+        />
+      </button>
       <Avatar
+        v-else
         :name="currentContact.name"
         :src="currentContact.thumbnail"
         :size="32"
         :status="currentContact.availability_status"
         hide-offline-status
       />
-      <div class="flex flex-col items-start min-w-0 ms-2 overflow-hidden">
+      <div
+        v-if="!hiloMobile"
+        class="flex flex-col items-start min-w-0 ms-2 overflow-hidden"
+      >
         <div class="flex flex-row items-center max-w-full gap-1 p-0 m-0">
           <span
             class="text-sm font-medium truncate leading-tight text-n-slate-12"
@@ -162,15 +239,50 @@ const copyConversationId = async () => {
         </div>
       </div>
     </div>
+    <Button
+      v-if="hiloMobile"
+      :aria-label="t('PORTELIA.HILO.ACCIONES')"
+      :aria-expanded="accionesAbiertas"
+      icon="i-lucide-ellipsis"
+      color="slate"
+      variant="ghost"
+      @click="accionesAbiertas = !accionesAbiertas"
+    />
     <div
+      v-show="!hiloMobile || accionesAbiertas"
       class="flex flex-row items-center justify-start xl:justify-end flex-shrink-0 gap-2 w-full xl:w-auto header-actions-wrap"
     >
+      <div
+        v-if="hiloMobile"
+        class="flex min-w-0 flex-1 flex-col text-xs text-n-slate-11"
+      >
+        <button type="button" class="text-start" @click="copyConversationId">
+          {{ `#${chat.id}` }}
+        </button>
+        <InboxName :inbox="inbox" class="!mx-0" />
+        <span v-if="isSnoozed" class="text-n-amber-11">{{
+          snoozedDisplayText
+        }}</span>
+      </div>
       <SLACardLabel
         v-if="hasSlaPolicyId"
         :chat="chat"
         show-extended-info
         :parent-width="width"
         class="hidden md:flex"
+      />
+      <Button
+        v-if="hiloMobile && showCopilot"
+        :aria-label="t('CONVERSATION.SIDEBAR.COPILOT')"
+        icon="i-woot-captain"
+        variant="ghost"
+        color="slate"
+        @click="
+          updateUISettings({
+            is_contact_sidebar_open: false,
+            is_copilot_panel_open: true,
+          })
+        "
       />
       <ConversationCallButton :inbox="inbox" :chat="currentChat" />
       <MoreActions :conversation-id="currentChat.id" />

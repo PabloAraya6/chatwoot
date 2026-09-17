@@ -281,6 +281,7 @@ export default {
       <NextButton
         v-if="!isEditorDisabled"
         v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_EMOJI_ICON')"
+        :aria-label="$t('CONVERSATION.REPLYBOX.TIP_EMOJI_ICON')"
         icon="i-ph-smiley-sticker"
         slate
         faded
@@ -291,6 +292,7 @@ export default {
         v-if="showAttachButton"
         ref="uploadRef"
         v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
+        :aria-label="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
         input-id="conversationAttachment"
         :size="4096 * 4096"
         :accept="allowedFileTypes"
@@ -306,6 +308,7 @@ export default {
         <NextButton
           v-if="showAttachButton"
           v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
+          :aria-label="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
           icon="i-ph-paperclip"
           slate
           faded
@@ -315,6 +318,7 @@ export default {
       <NextButton
         v-if="showAudioRecorderButton"
         v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_AUDIORECORDER_ICON')"
+        :aria-label="$t('CONVERSATION.REPLYBOX.TIP_AUDIORECORDER_ICON')"
         :icon="!isRecordingAudio ? 'i-ph-microphone' : 'i-ph-microphone-slash'"
         slate
         faded
@@ -333,6 +337,7 @@ export default {
       <NextButton
         v-if="showMessageSignatureButton"
         v-tooltip.top-end="signatureToggleTooltip"
+        :aria-label="signatureToggleTooltip"
         icon="i-ph-signature"
         slate
         faded

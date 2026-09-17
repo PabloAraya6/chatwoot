@@ -42,6 +42,18 @@ apagado el dashboard es Chatwoot stock. Los puntos de enchufe con upstream está
   viewport dinámico, mantiene acciones visibles y deja desplazar sólo el cuerpo. No recrea
   foco, Escape, backdrop ni botones. `clasesAsesor.js` agrupa las utilities opt-in del shell
   para controles táctiles y áreas seguras.
+- `components/hilo/`: contexto comercial compacto de la conversación. `BusquedaHilo` lee la
+  búsqueda vigente (zona, presupuesto y dormitorios) y despliega el resumen original de IA;
+  escucha las correcciones de `FichaPersona` para mantener los datos sincronizados.
+  `OpcionesHilo` abre las sugerencias en un diálogo y muestra dos candidatas al principio.
+  Cada `PropiedadSugerida` consulta su ficha actual antes de habilitar acciones, abre el envío
+  al cliente del hilo y precarga la propiedad en `NuevaVisita`. `NotaTraspaso` conserva la
+  nota original plegada como evento del chat. `VistasHilo` permite alternar mensajes y las
+  apps del contacto sin una barra pesada. `VisitasHilo` consulta las visitas de la persona
+  y abre `NuevaVisita` con el cliente del hilo; sustituye el antiguo dashboard app llamado
+  Visitas, conservando las demás integraciones. `useHiloMobile` acota cabecera/editor compactos al
+  flag y a pantallas menores de 768 px; las herramientas del editor se despliegan con +.
+  El editor conserva el envío, borradores, notas privadas, adjuntos y audio de Chatwoot.
 - `components/ficha/HistorialBusqueda.vue`: presenta `GET /mi/api/cambios` con antes/después y
   procedencia. `CampoBusqueda.vue` permite corregir sin perder el borrador ante un error.
   No interpreta la prosa del copiloto ni inventa un protocolo para aceptar/descartar sugerencias.

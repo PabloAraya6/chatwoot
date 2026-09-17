@@ -10,6 +10,7 @@ import {
 import { useEventListener } from '@vueuse/core';
 import { emitter } from 'shared/helpers/mitt';
 import { BUS_EVENTS } from 'shared/constants/busEvents';
+import { useHiloMobile } from 'dashboard/portelia/composables/useHiloMobile';
 
 const props = defineProps({
   containerHeight: { type: Number, default: 0 },
@@ -17,13 +18,15 @@ const props = defineProps({
 
 const DEFAULT_HEIGHT = 120;
 const MIN_HEIGHT = 80;
+const MOBILE_HEIGHT = 44;
+const hiloMobile = useHiloMobile();
 const MIN_MESSAGES_HEIGHT = 200;
 const EXPAND_RATIO = 0.5;
 const RESET_DELAY_MS = 120;
 
 const wrapperRef = useTemplateRef('wrapperRef');
 const surroundingHeight = ref(0);
-const editorHeight = ref(DEFAULT_HEIGHT);
+const editorHeight = ref(0);
 const isResizing = ref(false);
 const startY = ref(0);
 const startHeight = ref(0);
@@ -35,15 +38,17 @@ const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 const isContainerReady = computed(() => props.containerHeight > 0);
 
 const sizeBounds = computed(() => {
+  const minimum = hiloMobile.value ? MOBILE_HEIGHT : MIN_HEIGHT;
+  const defaultHeight = hiloMobile.value ? MOBILE_HEIGHT : DEFAULT_HEIGHT;
   const h = props.containerHeight;
   const s = surroundingHeight.value;
-  const max = Math.max(MIN_HEIGHT, h - MIN_MESSAGES_HEIGHT - s);
-  const expanded = clamp(Math.floor(h * EXPAND_RATIO - s / 2), MIN_HEIGHT, max);
+  const max = Math.max(minimum, h - MIN_MESSAGES_HEIGHT - s);
+  const expanded = clamp(Math.floor(h * EXPAND_RATIO - s / 2), minimum, max);
   return {
-    min: MIN_HEIGHT,
-    max: isContainerReady.value ? max : DEFAULT_HEIGHT,
+    min: minimum,
+    max: isContainerReady.value ? max : defaultHeight,
     expanded,
-    default: clamp(DEFAULT_HEIGHT, MIN_HEIGHT, max),
+    default: clamp(defaultHeight, minimum, max),
   };
 });
 
@@ -55,7 +60,9 @@ const appliedHeight = computed(() => {
   const requested = requestedHeight.value
     ? Math.max(requestedHeight.value, sizeBounds.value.default)
     : 0;
-  return clampToBounds(Math.max(requested, editorHeight.value));
+  return clampToBounds(
+    Math.max(requested, editorHeight.value || sizeBounds.value.default)
+  );
 });
 
 // Measure height of elements surrounding the editor (top panel, email fields, bottom panel)
@@ -110,7 +117,7 @@ const onResizeEnd = () => {
 
 const resetEditorHeight = () => {
   requestedHeight.value = 0;
-  editorHeight.value = sizeBounds.value.default;
+  editorHeight.value = 0;
 };
 
 const toggleEditorExpand = () => {
@@ -165,6 +172,7 @@ defineExpose({ toggleEditorExpand, resetEditorHeight });
     }"
   >
     <div
+      v-if="!hiloMobile"
       class="group absolute inset-x-0 -top-4 z-10 flex h-4 cursor-row-resize select-none items-center justify-center bg-gradient-to-b from-transparent from-10% dark:to-n-surface-1/80 to-n-surface-1/90 backdrop-blur-[0.01875rem]"
       @mousedown="onResizeStart"
       @touchstart.prevent="onResizeStart"

@@ -4,6 +4,8 @@ import ConversationHeader from './ConversationHeader.vue';
 import DashboardAppFrame from '../DashboardApp/Frame.vue';
 import EmptyState from './EmptyState/EmptyState.vue';
 import MessagesView from './MessagesView.vue';
+import VisitasHilo from 'dashboard/portelia/components/hilo/VisitasHilo.vue';
+import VistasHilo from 'dashboard/portelia/components/hilo/VistasHilo.vue';
 import TraspasoHilo from 'dashboard/portelia/components/TraspasoHilo.vue';
 import { usePorteliaUi } from 'dashboard/portelia/composables/usePorteliaUi';
 
@@ -14,6 +16,8 @@ export default {
     EmptyState,
     MessagesView,
     TraspasoHilo,
+    VistasHilo,
+    VisitasHilo,
   },
   props: {
     inboxId: {
@@ -46,6 +50,29 @@ export default {
       dashboardApps: 'dashboardApps/getRecords',
     }),
     dashboardAppTabs() {
+      if (this.hasPorteliaUi) {
+        return [
+          {
+            key: 'messages',
+            index: 0,
+            name: this.$t('CONVERSATION.DASHBOARD_APP_TAB_MESSAGES'),
+          },
+          {
+            key: 'visits',
+            index: -1,
+            name: this.$t('PORTELIA.FICHA.VISITAS.TITULO'),
+          },
+          ...this.dashboardApps
+            .filter(
+              app => app.title !== this.$t('PORTELIA.FICHA.VISITAS.TITULO')
+            )
+            .map(app => ({
+              key: `dashboard-${app.id}`,
+              index: this.dashboardApps.indexOf(app) + 1,
+              name: app.title,
+            })),
+        ];
+      }
       return [
         {
           key: 'messages',
@@ -113,9 +140,19 @@ export default {
         'border-b border-b-n-weak !pt-2': !dashboardApps.length,
       }"
     />
-    <TraspasoHilo v-if="hasPorteliaUi && currentChat.id" :chat="currentChat" />
+    <TraspasoHilo
+      v-if="hasPorteliaUi && currentChat.id"
+      v-show="!activeIndex"
+      :chat="currentChat"
+    />
+    <VistasHilo
+      v-if="hasPorteliaUi && currentChat.id"
+      :tabs="dashboardAppTabs"
+      :active-index="activeIndex"
+      @change="onDashboardAppTabChange"
+    />
     <woot-tabs
-      v-if="dashboardApps.length && currentChat.id"
+      v-else-if="dashboardApps.length && currentChat.id"
       :index="activeIndex"
       class="h-10"
       @change="onDashboardAppTabChange"
@@ -141,6 +178,11 @@ export default {
       />
       <slot />
     </div>
+    <VisitasHilo
+      v-if="hasPorteliaUi && activeIndex === -1 && currentChat.id"
+      :key="currentChat.id"
+      :chat="currentChat"
+    />
     <DashboardAppFrame
       v-for="(dashboardApp, index) in dashboardApps"
       v-show="activeIndex - 1 === index"

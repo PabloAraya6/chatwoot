@@ -12,6 +12,8 @@ import miApi from '../../api/miApi';
 
 const props = defineProps({
   propiedadId: { type: String, required: true },
+  destinatario: { type: Object, default: null },
+  propiedadTitulo: { type: String, default: '' },
 });
 
 const { t } = useI18n();
@@ -47,6 +49,15 @@ const opciones = computed(() =>
 const cargar = async () => {
   conversaciones.value = [];
   fallo.value = false;
+  if (props.destinatario) {
+    conversaciones.value = [
+      {
+        id: props.destinatario.id,
+        meta: { sender: { name: props.destinatario.nombre } },
+      },
+    ];
+    return;
+  }
 
   try {
     const respuesta = await run(conversacionesPropias);
@@ -104,7 +115,11 @@ defineExpose({ abrir });
   <DialogoAsesor
     ref="dialogRef"
     :title="t('PORTELIA.PROPIEDADES.ENVIAR.TITULO')"
-    :description="t('PORTELIA.PROPIEDADES.ENVIAR.DESCRIPCION')"
+    :description="
+      destinatario
+        ? propiedadTitulo
+        : t('PORTELIA.PROPIEDADES.ENVIAR.DESCRIPCION')
+    "
     :confirm-button-label="t('PORTELIA.PROPIEDADES.ENVIAR.CONFIRMAR')"
     :is-loading="enviando"
     :disable-confirm-button="!puedeEnviar"
@@ -124,6 +139,9 @@ defineExpose({ abrir });
     </Banner>
     <p v-else-if="!opciones.length" class="mb-0 text-sm text-n-slate-11">
       {{ t('PORTELIA.PROPIEDADES.ENVIAR.SIN_CONVERSACIONES') }}
+    </p>
+    <p v-else-if="destinatario" class="mb-0 text-sm text-n-slate-12">
+      {{ t('PORTELIA.HILO.ENVIAR_A', { nombre: destinatario.nombre }) }}
     </p>
     <label v-else class="flex flex-col gap-1">
       <span class="text-sm font-medium text-n-slate-12">

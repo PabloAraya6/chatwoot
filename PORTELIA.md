@@ -23,6 +23,10 @@ punto de enchufe queda anotado acá. Las decisiones viven en el monorepo
 | `public/sw.js` | El push muestra cuerpo, ícono y badge, y siempre muestra algo (WebKit revoca la suscripción si un push no termina en notificación); al tocarla enfoca la PWA y navega al hilo, en vez de abrir una ventana nueva salvo que esa URL exacta ya estuviera abierta. |
 | `app/javascript/dashboard/components/ChatListHeader.vue` | Con el flag no muestra el botón de filtros avanzados. |
 | `app/javascript/dashboard/components/widgets/conversation/ConversationBox.vue` | Con el flag monta `TraspasoHilo` entre el encabezado y los mensajes (dueño, Tomar, la nota de traspaso y, si un humano ya habló, el aviso de que la secretaria calla con el botón para devolvérsela). |
+| `app/javascript/dashboard/components/widgets/conversation/ConversationHeader.vue` | `useHiloMobile` compacta la cabecera y despliega las acciones desde un botón; el escritorio y el flag apagado conservan el encabezado stock. |
+| `app/javascript/dashboard/components/widgets/conversation/ReplyBox.vue`, `ResizableEditorWrapper.vue` | Con `useHiloMobile`, editor inicial de 44 px que crece al escribir, placeholder corto, envío sin atajo de teclado en la etiqueta y sin foco automático al abrir el hilo. |
+| `app/javascript/dashboard/components-next/Conversation/SidepanelSwitch.vue` | Con `useHiloMobile`, el acceso al contacto se ubica junto al responsable y deja libre la búsqueda. |
+| `app/javascript/dashboard/components-next/message/Message.vue` | Con el flag, las notas privadas de traspaso usan `NotaTraspaso`: el contenido original queda plegado en el historial para no repetir el resumen de la cabecera. |
 | `app/javascript/dashboard/routes/dashboard/dashboard.routes.js` | Suma `porteliaRoutes` como hijas de `AppContainer` y `rutasSinCuenta` (`/app/compartir`, el destino del `share_target`) al nivel de arriba. |
 | `app/javascript/dashboard/i18n/locale/es/index.js` | Mezcla `portelia/i18n/es/portelia.json`. |
 | `app/views/layouts/vueapp.html.erb` | `theme-color` y `msapplication-TileColor` de la marca (`#014CA1`). |
@@ -115,3 +119,11 @@ Congelado en `v4.17.1` durante el mapa; se rebasea sólo por un parche de seguri
 3. `pnpm eslint`, `bin/portelia-dev build` y probar el sidebar con el flag prendido y apagado.
 4. `git push --force-with-lease portelia portelia` y anotar el SHA nuevo en `deploy/` del
    monorepo (`deploy/README.md` tiene el resto de la receta).
+
+La composición mobile del hilo usa `hilo/` para la búsqueda breve, las vistas y las
+propiedades bajo demanda. `ReplyBox` sólo revela sus paneles de herramientas al pedirlos;
+`Message` presenta el traspaso y la actividad como eventos; `MessageMeta` abrevia la hora
+manteniendo la fecha completa en el título. Estos ajustes se activan con `portelia_ui`.
+
+`BackButton` obtiene el router por inyección (`useRouter`): importar el singleton de rutas
+creaba un ciclo de inicialización con `SettingsHeader` al recargar el dashboard.
