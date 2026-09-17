@@ -7,9 +7,9 @@ import Button from 'dashboard/components-next/button/Button.vue';
 import DialogoAsesor from '../DialogoAsesor.vue';
 import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
-import EmptyStateLayout from 'dashboard/components-next/EmptyStateLayout.vue';
 import miApi from '../../api/miApi';
 import { listarTodasLasPropiedades } from '../../api/propiedades';
+import EstadoVacio from '../EstadoVacio.vue';
 import NuevaReaccion from '../ficha/NuevaReaccion.vue';
 import NuevaOperacion from '../ficha/NuevaOperacion.vue';
 import TarjetaVisita from './TarjetaVisita.vue';
@@ -242,11 +242,12 @@ onMounted(cargar);
                   · {{ hoyDia.etiqueta }}
                 </span>
               </h2>
-              <EmptyStateLayout
+              <EstadoVacio
                 v-if="!hoyDia.visitas.length"
                 :title="t('PORTELIA.AGENDA.HOY_VACIO_TITULO')"
-                :subtitle="t('PORTELIA.AGENDA.HOY_VACIO_DETALLE')"
-                :show-backdrop="false"
+                :detail="t('PORTELIA.AGENDA.HOY_VACIO_DETALLE')"
+                icon="i-lucide-calendar-check"
+                compact
               />
               <TarjetaVisita
                 v-for="visita in hoyDia.visitas"
@@ -262,9 +263,12 @@ onMounted(cargar);
               <h2 class="mb-0 text-base font-medium text-n-slate-12">
                 {{ t('PORTELIA.AGENDA.SEMANA') }}
               </h2>
-              <p v-if="!semana.length" class="mb-0 text-sm text-n-slate-11">
-                {{ t('PORTELIA.AGENDA.SEMANA_VACIA') }}
-              </p>
+              <EstadoVacio
+                v-if="!semana.length"
+                :title="t('PORTELIA.AGENDA.SEMANA_VACIA')"
+                icon="i-lucide-calendar-days"
+                compact
+              />
               <div
                 v-for="dia in semana"
                 :key="dia.clave"

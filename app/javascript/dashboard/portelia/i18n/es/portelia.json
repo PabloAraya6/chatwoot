@@ -212,6 +212,8 @@
       "VISITAS": {
         "TITULO": "Visitas",
         "VACIAS": "Sin visitas.",
+        "VACIAS_TITULO": "Todavía no hay visitas",
+        "VACIAS_DETALLE": "Agendá la primera visita para verla acá y en la agenda.",
         "ESTADO": {
           "pendiente": "pendiente",
           "confirmada": "confirmada",

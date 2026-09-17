@@ -7,6 +7,7 @@ import { useAccount } from 'dashboard/composables/useAccount';
 import { useMapGetter } from 'dashboard/composables/store';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
+import EstadoVacio from '../EstadoVacio.vue';
 import NuevaVisita from '../agenda/NuevaVisita.vue';
 import { fechaCorta, nombrePropiedad } from '../ficha/formato';
 import miApi from '../../api/miApi';
@@ -51,13 +52,15 @@ watch(() => props.chat.id, cargar, { immediate: true });
     class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4"
     :aria-label="t('PORTELIA.FICHA.VISITAS.TITULO')"
   >
-    <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex min-h-11 flex-wrap items-center justify-end gap-2">
       <Button
+        v-if="visitas.length"
         :label="t('PORTELIA.AGENDA.NUEVA.TITULO')"
         icon="i-lucide-calendar-plus"
         variant="faded"
         :disabled="!puedeAgendar"
-        @click="nuevaVisita.abrir()"
+        class="me-auto"
+        @click="nuevaVisita?.abrir()"
       />
       <RouterLink
         :to="accountScopedRoute('portelia_agenda')"
@@ -66,8 +69,14 @@ watch(() => props.chat.id, cargar, { immediate: true });
         {{ t('PORTELIA.AGENDA.TITULO') }}
       </RouterLink>
     </div>
-    <Spinner v-if="isPending" class="self-center" />
-    <div v-else-if="fallo" role="alert" class="text-sm text-n-slate-11">
+    <div v-if="isPending" class="flex flex-1 items-center justify-center">
+      <Spinner />
+    </div>
+    <div
+      v-else-if="fallo"
+      role="alert"
+      class="flex flex-1 flex-col items-center justify-center gap-2 text-center text-sm text-n-slate-11"
+    >
       <p>{{ t('PORTELIA.AGENDA.ERROR_CARGA') }}</p>
       <Button
         :label="t('PORTELIA.REINTENTAR')"
@@ -76,9 +85,21 @@ watch(() => props.chat.id, cargar, { immediate: true });
         @click="cargar"
       />
     </div>
-    <p v-else-if="!visitas.length" class="text-sm text-n-slate-11">
-      {{ t('PORTELIA.FICHA.VISITAS.VACIAS') }}
-    </p>
+    <EstadoVacio
+      v-else-if="!visitas.length"
+      :title="t('PORTELIA.FICHA.VISITAS.VACIAS_TITULO')"
+      :detail="t('PORTELIA.FICHA.VISITAS.VACIAS_DETALLE')"
+      icon="i-lucide-calendar-days"
+    >
+      <template #actions>
+        <Button
+          :label="t('PORTELIA.AGENDA.NUEVA.TITULO')"
+          icon="i-lucide-calendar-plus"
+          :disabled="!puedeAgendar"
+          @click="nuevaVisita?.abrir()"
+        />
+      </template>
+    </EstadoVacio>
     <article
       v-for="visita in visitas"
       :key="visita.id"
