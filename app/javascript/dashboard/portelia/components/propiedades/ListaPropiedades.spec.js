@@ -27,7 +27,12 @@ describe('ListaPropiedades', () => {
       'PORTELIA.PROPIEDADES.ERROR_CARGA'
     );
 
-    miApi.get.mockResolvedValueOnce({ data: [] });
+    miApi.get.mockResolvedValueOnce({
+      data: {
+        items: [],
+        paginacion: { pagina: 1, porPagina: 20, total: 0, paginas: 1 },
+      },
+    });
     wrapper.getComponent(Banner).vm.$emit('action');
     await flushPromises();
 
@@ -35,17 +40,31 @@ describe('ListaPropiedades', () => {
     expect(wrapper.findComponent(EmptyStateLayout).exists()).toBe(true);
   });
 
-  it.each([1, 200])(
-    'keeps all %i properties in the loaded catalog',
+  it.each([1, 20])(
+    'renders the %i properties returned for the current page',
     async count => {
       miApi.get.mockResolvedValueOnce({
-        data: Array.from({ length: count }, (_, id) => ({ id, fotos: [] })),
+        data: {
+          items: Array.from({ length: count }, (_, id) => ({ id, fotos: [] })),
+          paginacion: {
+            pagina: 1,
+            porPagina: 20,
+            total: count === 20 ? 75 : count,
+            paginas: count === 20 ? 4 : 1,
+          },
+        },
       });
       const wrapper = shallowMount(ListaPropiedades);
       await flushPromises();
 
       expect(wrapper.findAllComponents(TarjetaPropiedad)).toHaveLength(count);
       expect(wrapper.findComponent(EmptyStateLayout).exists()).toBe(false);
+      expect(miApi.get).toHaveBeenCalledWith(
+        'propiedades',
+        expect.objectContaining({
+          params: expect.objectContaining({ pagina: 1, porPagina: 20 }),
+        })
+      );
     }
   );
 });

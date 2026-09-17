@@ -12,12 +12,19 @@ vi.mock('../../api/miApi', () => ({
 vi.mock('dashboard/composables', () => ({ useAlert: vi.fn() }));
 vi.mock('vue-router', () => ({ useRoute: () => ({ params: {} }) }));
 
+const paginaVacia = {
+  data: {
+    items: [],
+    paginacion: { pagina: 1, porPagina: 100, total: 0, paginas: 1 },
+  },
+};
+
 describe('FichaPersona', () => {
   it('cancels the previous person read and keeps the new person loading', async () => {
     let previousSignal;
     let resolveCurrent;
     miApi.get.mockImplementation((ruta, { signal }) => {
-      if (ruta === 'propiedades') return Promise.resolve({ data: [] });
+      if (ruta === 'propiedades') return Promise.resolve(paginaVacia);
       if (ruta === 'personas/1') {
         previousSignal = signal;
         return new Promise((resolve, reject) => {
@@ -56,7 +63,7 @@ describe('FichaPersona', () => {
 
   it('retries a failed read without showing empty sections', async () => {
     miApi.get.mockRejectedValueOnce(new Error('offline'));
-    miApi.get.mockResolvedValueOnce({ data: [] });
+    miApi.get.mockResolvedValueOnce(paginaVacia);
     const wrapper = shallowMount(FichaPersona, {
       props: { contactId: 1 },
       global: { renderStubDefaultSlot: true },
@@ -70,7 +77,7 @@ describe('FichaPersona', () => {
     miApi.get.mockResolvedValueOnce({
       data: { busquedas: [], visitas: [], reacciones: [], operaciones: [] },
     });
-    miApi.get.mockResolvedValueOnce({ data: [] });
+    miApi.get.mockResolvedValueOnce(paginaVacia);
     wrapper.getComponent(Banner).vm.$emit('action');
     await flushPromises();
     expect(wrapper.findComponent(Banner).exists()).toBe(false);
@@ -99,7 +106,7 @@ describe('FichaPersona', () => {
         ],
       },
     });
-    miApi.get.mockResolvedValueOnce({ data: [] });
+    miApi.get.mockResolvedValueOnce(paginaVacia);
     const wrapper = shallowMount(FichaPersona, { props: { contactId: 1 } });
     await flushPromises();
 

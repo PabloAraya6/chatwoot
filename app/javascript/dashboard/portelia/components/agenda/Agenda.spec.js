@@ -17,6 +17,13 @@ vi.mock('../../api/miApi', () => ({
   default: { get: vi.fn(), patch: vi.fn() },
 }));
 
+const pagina = items => ({
+  data: {
+    items,
+    paginacion: { pagina: 1, porPagina: 100, total: items.length, paginas: 1 },
+  },
+});
+
 it('distinguishes read failure from an empty agenda and retries', async () => {
   miApi.get.mockRejectedValue(new Error('offline'));
   const wrapper = shallowMount(Agenda, {
@@ -27,7 +34,9 @@ it('distinguishes read failure from an empty agenda and retries', async () => {
     'PORTELIA.AGENDA.ERROR_CARGA'
   );
   expect(wrapper.find('empty-state-layout-stub').exists()).toBe(false);
-  miApi.get.mockResolvedValue({ data: [] });
+  miApi.get.mockImplementation(ruta =>
+    Promise.resolve(ruta === 'propiedades' ? pagina([]) : { data: [] })
+  );
   wrapper.getComponent(Banner).vm.$emit('action');
   await flushPromises();
   expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -42,7 +51,7 @@ it('serializes changes and binds follow-up reaction to the completed visit', asy
     estado: 'confirmada',
   }));
   miApi.get.mockImplementation(ruta =>
-    Promise.resolve({ data: ruta === 'propiedades' ? [] : visitas })
+    Promise.resolve(ruta === 'propiedades' ? pagina([]) : { data: visitas })
   );
   let resolve;
   miApi.patch.mockReturnValueOnce(

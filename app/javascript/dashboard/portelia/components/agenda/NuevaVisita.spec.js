@@ -22,7 +22,12 @@ it('aborts the old day, distinguishes failed slots, and only submits a current s
   let oldSignal;
   miApi.get.mockImplementation((ruta, options) => {
     if (ruta === 'propiedades')
-      return Promise.resolve({ data: [{ id: 'p', estado: 'disponible' }] });
+      return Promise.resolve({
+        data: {
+          items: [{ id: 'p', estado: 'disponible' }],
+          paginacion: { pagina: 1, porPagina: 100, total: 1, paginas: 1 },
+        },
+      });
     oldSignal = options.signal;
     return new Promise((resolve, reject) => {
       rejectOld = reject;

@@ -9,6 +9,7 @@ import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Label from 'dashboard/components-next/label/Label.vue';
 import miApi from '../../api/miApi';
+import { listarTodasLasPropiedades } from '../../api/propiedades';
 import { CAMPOS_BUSQUEDA } from './camposBusqueda';
 import { fechaCorta, nombrePropiedad, precio } from './formato';
 import { emitter } from 'shared/helpers/mitt';
@@ -93,7 +94,7 @@ const cargar = async () => {
     const respuesta = await run(signal =>
       Promise.all([
         miApi.get(`personas/${props.contactId}`, { signal }),
-        miApi.get('propiedades', { signal }),
+        listarTodasLasPropiedades(signal),
       ])
     );
 
@@ -104,7 +105,7 @@ const cargar = async () => {
     visitas.value = persona.data.visitas;
     reacciones.value = persona.data.reacciones;
     operaciones.value = persona.data.operaciones;
-    propiedades.value = lista.data;
+    propiedades.value = lista;
   } catch {
     fallo.value = true;
   }

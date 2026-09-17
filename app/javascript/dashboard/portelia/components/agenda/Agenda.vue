@@ -9,6 +9,7 @@ import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import EmptyStateLayout from 'dashboard/components-next/EmptyStateLayout.vue';
 import miApi from '../../api/miApi';
+import { listarTodasLasPropiedades } from '../../api/propiedades';
 import NuevaReaccion from '../ficha/NuevaReaccion.vue';
 import NuevaOperacion from '../ficha/NuevaOperacion.vue';
 import TarjetaVisita from './TarjetaVisita.vue';
@@ -80,11 +81,11 @@ const cargar = async () => {
       miApi.get(
         `agenda?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`
       ),
-      miApi.get('propiedades'),
+      listarTodasLasPropiedades(),
     ]);
 
     visitas.value = agenda.data;
-    propiedades.value = lista.data;
+    propiedades.value = lista;
     traerNombres();
   } catch {
     fallo.value = true;

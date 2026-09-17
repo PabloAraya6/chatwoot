@@ -10,6 +10,7 @@ import Select from 'dashboard/components-next/select/Select.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import miApi from '../../api/miApi';
+import { listarTodasLasPropiedades } from '../../api/propiedades';
 import { nombrePropiedad } from '../ficha/formato';
 import { hoy } from './visita';
 
@@ -108,13 +109,13 @@ const cargar = async () => {
   try {
     const respuesta = await runDatos(signal =>
       Promise.all([
-        miApi.get('propiedades', { signal }),
+        listarTodasLasPropiedades(signal),
         desdeElHilo.value ? Promise.resolve([]) : conversacionesPropias(signal),
       ])
     );
     if (!respuesta) return;
     const [lista, abiertas] = respuesta;
-    propiedades.value = lista.data;
+    propiedades.value = lista;
     conversaciones.value = abiertas;
   } catch {
     fallo.value = true;

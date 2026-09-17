@@ -37,11 +37,60 @@ export const opcionesDe = (valores, t, grupo) =>
     label: t(`PORTELIA.PROPIEDADES.${grupo}.${valor}`),
   }));
 
-export const tituloDe = (propiedad, t) =>
-  propiedad.direccion ||
-  [t(`PORTELIA.PROPIEDADES.TIPO.${propiedad.tipo}`), propiedad.zona]
-    .filter(Boolean)
-    .join(' · ');
+const PREFIJO_DE_NOMBRE =
+  /^(?:torres?|consorcio|ccio\.?|edificio|complejo|barrio privado|loteo|condominio|country)\b/i;
+
+const ENCABEZADO_GENERICO =
+  /^(?:el proyecto|avance de obra|casa|departamento|depto\.?|terreno|lote|finca|galp[oó]n|local|oficina|excelente|oportunidad)\b/i;
+
+const nombreDesdeDescripcion = descripcion => {
+  const primeraLinea = String(descripcion || '')
+    .split(/\n+/)
+    .map(linea =>
+      linea
+        .replace(
+          /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s✅🚩🔺•·-]+/gu,
+          ''
+        )
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+    .find(Boolean);
+
+  if (
+    !primeraLinea ||
+    primeraLinea.length > 90 ||
+    ENCABEZADO_GENERICO.test(primeraLinea)
+  ) {
+    return '';
+  }
+  if (PREFIJO_DE_NOMBRE.test(primeraLinea)) return primeraLinea;
+
+  const letras = primeraLinea.replace(/[^\p{L}]/gu, '');
+  const pareceNombre =
+    letras.length >= 4 &&
+    primeraLinea.split(/\s+/).length <= 10 &&
+    !/[.:;]$/.test(primeraLinea) &&
+    letras === letras.toLocaleUpperCase('es-AR');
+
+  return pareceNombre ? primeraLinea : '';
+};
+
+export const tituloDe = (propiedad, t) => {
+  const nombre = nombreDesdeDescripcion(propiedad.descripcion);
+
+  if (nombre && propiedad.direccion) {
+    return `[${nombre}] - ${propiedad.direccion}`;
+  }
+
+  return (
+    nombre ||
+    propiedad.direccion ||
+    [t(`PORTELIA.PROPIEDADES.TIPO.${propiedad.tipo}`), propiedad.zona]
+      .filter(Boolean)
+      .join(' · ')
+  );
+};
 
 export const lugarDe = propiedad =>
   [propiedad.zona, propiedad.ciudad].filter(Boolean).join(', ');

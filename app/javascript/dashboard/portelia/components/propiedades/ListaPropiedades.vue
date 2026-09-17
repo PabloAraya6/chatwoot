@@ -1,8 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAccount } from 'dashboard/composables/useAccount';
+import { useAbortableRequest } from 'dashboard/composables/useAbortableRequest';
 import Banner from 'dashboard/components-next/banner/Banner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Input from 'dashboard/components-next/input/Input.vue';
@@ -23,9 +25,11 @@ const router = useRouter();
 
 const { accountScopedRoute } = useAccount();
 
-const propiedades = ref([]);
+const { run, isPending: cargando } = useAbortableRequest();
 
-const cargando = ref(true);
+const POR_PAGINA = 20;
+
+const propiedades = ref([]);
 
 const fallo = ref(false);
 
@@ -34,6 +38,13 @@ const busqueda = ref('');
 const estado = ref('');
 
 const operacion = ref('');
+
+const paginacion = ref({
+  pagina: 1,
+  porPagina: POR_PAGINA,
+  total: 0,
+  paginas: 1,
+});
 
 const importarRef = ref(null);
 
@@ -48,44 +59,51 @@ const opcionesOperacion = computed(() => [
 ]);
 
 const cargar = async () => {
-  cargando.value = true;
   fallo.value = false;
 
   try {
-    propiedades.value = (await miApi.get('propiedades')).data;
+    const respuesta = await run(signal =>
+      miApi.get('propiedades', {
+        signal,
+        params: {
+          pagina: paginacion.value.pagina,
+          porPagina: POR_PAGINA,
+          consulta: busqueda.value.trim() || undefined,
+          estado: estado.value || undefined,
+          operacion: operacion.value || undefined,
+        },
+      })
+    );
+
+    if (respuesta) {
+      propiedades.value = respuesta.data.items;
+      paginacion.value = respuesta.data.paginacion;
+    }
   } catch {
     fallo.value = true;
-  } finally {
-    cargando.value = false;
   }
 };
-
-const textoDe = propiedad =>
-  [
-    propiedad.direccion,
-    propiedad.zona,
-    propiedad.ciudad,
-    propiedad.idExterno,
-    propiedad.descripcion,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-
-const filtradas = computed(() => {
-  const termino = busqueda.value.trim().toLowerCase();
-
-  return propiedades.value.filter(
-    propiedad =>
-      (!estado.value || propiedad.estado === estado.value) &&
-      (!operacion.value || propiedad.operacion === operacion.value) &&
-      (!termino || textoDe(propiedad).includes(termino))
-  );
-});
 
 const hayFiltros = computed(() =>
   Boolean(busqueda.value.trim() || estado.value || operacion.value)
 );
+
+const actualizarBusqueda = useDebounceFn(() => {
+  paginacion.value.pagina = 1;
+  cargar();
+}, 300);
+
+watch(busqueda, actualizarBusqueda);
+
+watch([estado, operacion], () => {
+  paginacion.value.pagina = 1;
+  cargar();
+});
+
+const irAPagina = pagina => {
+  paginacion.value.pagina = pagina;
+  cargar();
+};
 
 const irANueva = () =>
   router.push(accountScopedRoute('portelia_propiedad_nueva'));
@@ -183,7 +201,7 @@ onMounted(() => {
             {{ t('PORTELIA.PROPIEDADES.ERROR_CARGA') }}
           </Banner>
           <EmptyStateLayout
-            v-else-if="!propiedades.length"
+            v-else-if="!propiedades.length && !hayFiltros"
             :title="t('PORTELIA.PROPIEDADES.VACIO_TITULO')"
             :subtitle="t('PORTELIA.PROPIEDADES.VACIO_DETALLE')"
             :show-backdrop="false"
@@ -206,25 +224,55 @@ onMounted(() => {
             </template>
           </EmptyStateLayout>
           <p
-            v-else-if="!filtradas.length"
+            v-else-if="!propiedades.length"
             class="py-20 text-sm text-center text-n-slate-11"
           >
             {{ t('PORTELIA.PROPIEDADES.SIN_RESULTADOS') }}
           </p>
           <div v-else class="flex flex-col gap-3">
-            <p v-if="hayFiltros" class="mb-0 text-sm text-n-slate-11">
+            <p class="mb-0 text-sm text-n-slate-11">
               {{
                 t('PORTELIA.PROPIEDADES.CONTEO', {
-                  n: filtradas.length,
-                  total: propiedades.length,
+                  n: propiedades.length,
+                  total: paginacion.total,
                 })
               }}
             </p>
             <TarjetaPropiedad
-              v-for="propiedad in filtradas"
+              v-for="propiedad in propiedades"
               :key="propiedad.id"
               :propiedad="propiedad"
             />
+            <footer
+              v-if="paginacion.paginas > 1"
+              class="flex items-center justify-between gap-3 pt-3"
+            >
+              <Button
+                :label="t('PORTELIA.PROPIEDADES.PAGINACION.ANTERIOR')"
+                icon="i-lucide-chevron-left"
+                color="slate"
+                variant="ghost"
+                :disabled="paginacion.pagina <= 1 || cargando"
+                @click="irAPagina(paginacion.pagina - 1)"
+              />
+              <span class="text-sm text-n-slate-11">
+                {{
+                  t('PORTELIA.PROPIEDADES.PAGINACION.PAGINA', {
+                    pagina: paginacion.pagina,
+                    paginas: paginacion.paginas,
+                  })
+                }}
+              </span>
+              <Button
+                :label="t('PORTELIA.PROPIEDADES.PAGINACION.SIGUIENTE')"
+                icon="i-lucide-chevron-right"
+                trailing-icon
+                color="slate"
+                variant="ghost"
+                :disabled="paginacion.pagina >= paginacion.paginas || cargando"
+                @click="irAPagina(paginacion.pagina + 1)"
+              />
+            </footer>
           </div>
         </div>
       </main>

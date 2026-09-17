@@ -64,6 +64,11 @@
       "TODOS_ESTADOS": "Todos los estados",
       "TODAS_OPERACIONES": "Todas las operaciones",
       "CONTEO": "{n} de {total} propiedades",
+      "PAGINACION": {
+        "ANTERIOR": "Anterior",
+        "SIGUIENTE": "Siguiente",
+        "PAGINA": "Página {pagina} de {paginas}"
+      },
       "SIN_RESULTADOS": "Ninguna propiedad coincide con la búsqueda.",
       "VACIO_TITULO": "Todavía no hay propiedades",
       "VACIO_DETALLE": "Pegá el link de un aviso y la ficha se arma sola, o cargá una a mano.",
